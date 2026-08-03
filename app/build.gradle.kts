@@ -15,7 +15,7 @@ android {
   compileSdk = 36
 
   defaultConfig {
-    applicationId = "com.aistudio.copyinbox.qxmpzq"
+    applicationId = "com.inscopelabs.abx.clipinbox"
     minSdk = 24
     targetSdk = 36
     versionCode = 1
