@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.ui.MainActivity
 import com.inscopelabs.abx.clipinbox.ui.TransparentCaptureActivity
 
@@ -44,13 +45,13 @@ object NotificationHelper {
 
         val captureAction = NotificationCompat.Action.Builder(
             android.R.drawable.ic_menu_save,
-            "Capture Clipboard",
+            context.getString(R.string.notification_action_capture),
             capturePendingIntent
         ).build()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setContentTitle("ClipInBox")
-            .setContentText("Quick clipboard capture ready")
+            .setContentTitle(context.getString(R.string.notification_title))
+            .setContentText(context.getString(R.string.notification_content_text))
             .setSmallIcon(android.R.drawable.ic_menu_save)
             .setContentIntent(contentPendingIntent)
             .addAction(captureAction)
@@ -69,10 +70,10 @@ object NotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "ClipInBox Shortcut",
+                context.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Dismissible notification shortcut to quickly capture clipboard text"
+                description = context.getString(R.string.notification_channel_desc)
             }
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             manager?.createNotificationChannel(channel)

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
+import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.utils.ClipboardHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ class TransparentCaptureActivity : Activity() {
 
         val text = ClipboardHelper.getPrimaryClipText(this)
         if (text.isNullOrBlank()) {
-            Toast.makeText(this, "Clipboard is empty!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.capture_toast_clipboard_empty), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -27,9 +28,9 @@ class TransparentCaptureActivity : Activity() {
             val saved = app.repository.saveClipText(text)
             withContext(Dispatchers.Main) {
                 if (saved) {
-                    Toast.makeText(applicationContext, "Saved to ClipInBox!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, getString(R.string.capture_toast_saved), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, "Clip already exists in ClipInBox", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, getString(R.string.capture_toast_clip_exists), Toast.LENGTH_SHORT).show()
                 }
                 finish()
             }

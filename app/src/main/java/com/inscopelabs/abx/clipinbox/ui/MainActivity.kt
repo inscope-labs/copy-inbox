@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val saved = app.repository.saveClipText(sharedText)
                     if (saved) {
-                        Toast.makeText(this@MainActivity, "Saved shared text to ClipInBox!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.main_toast_shared_text_saved), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

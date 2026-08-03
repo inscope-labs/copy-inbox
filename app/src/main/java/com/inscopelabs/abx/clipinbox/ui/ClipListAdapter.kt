@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.data.local.ClipEntity
 import com.inscopelabs.abx.clipinbox.databinding.ItemClipBinding
 import com.inscopelabs.abx.clipinbox.utils.TimeFormatter
@@ -87,7 +88,11 @@ class ClipListAdapter(
                 binding.tvContent.typeface = Typeface.DEFAULT
             }
 
-            binding.tvMetaCounts.text = "${clip.charCount} chars • ${clip.wordCount} words"
+            binding.tvMetaCounts.text = binding.root.context.getString(
+                R.string.clip_item_meta_counts_format,
+                clip.charCount,
+                clip.wordCount
+            )
 
             binding.btnPin.setImageResource(
                 if (clip.isPinned) android.R.drawable.ic_menu_today else android.R.drawable.ic_menu_agenda

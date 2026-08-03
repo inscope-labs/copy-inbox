@@ -54,15 +54,15 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             if (clipsToExport.isNotEmpty()) {
                 try {
                     FileExporter.exportAsTxt(requireContext(), clipsToExport, uri)
-                    showMessage("Exported ${clipsToExport.size} clip(s) to TXT")
+                    showMessage(getString(R.string.home_export_success_format, clipsToExport.size))
                     if (adapter.isSelectionMode()) {
                         adapter.clearSelection()
                     }
                 } catch (e: Exception) {
-                    showMessage("Export failed: ${e.message}")
+                    showMessage(getString(R.string.home_export_failed_format, e.message.orEmpty()))
                 }
             } else {
-                showMessage("No clips to export")
+                showMessage(getString(R.string.home_export_empty))
             }
         }
     }
@@ -129,14 +129,14 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         binding.btnCaptureClipboard.setOnClickListener {
             val text = ClipboardHelper.getPrimaryClipText(requireContext())
             if (text.isNullOrBlank()) {
-                showMessage("Clipboard is currently empty")
+                showMessage(getString(R.string.home_toast_clipboard_empty))
             } else {
                 lifecycleScope.launch {
                     val saved = repository.saveClipText(text)
                     if (saved) {
-                        showMessage("Captured current clipboard text!")
+                        showMessage(getString(R.string.home_toast_clipboard_captured))
                     } else {
-                        showMessage("Clip already exists in history")
+                        showMessage(getString(R.string.home_toast_clip_exists))
                     }
                 }
             }
@@ -151,9 +151,9 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             val app = requireActivity().application as ClipInBoxApplication
             app.setNotificationTriggerEnabled(isChecked)
             if (isChecked) {
-                showMessage("Capture notification pinned")
+                showMessage(getString(R.string.home_toast_notification_pinned))
             } else {
-                showMessage("Capture notification unpinned")
+                showMessage(getString(R.string.home_toast_notification_unpinned))
             }
         }
     }
@@ -176,7 +176,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         binding.btnExportSelected.setOnClickListener {
             val selectedClips = adapter.getSelectedClips()
             if (selectedClips.isEmpty()) {
-                showMessage("No clips selected")
+                showMessage(getString(R.string.home_toast_no_clips_selected))
                 return@setOnClickListener
             }
             val timestamp = System.currentTimeMillis()
@@ -189,7 +189,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             lifecycleScope.launch {
                 selectedClips.forEach { repository.deleteClip(it) }
                 adapter.clearSelection()
-                showMessage("Deleted ${selectedClips.size} clip(s)")
+                showMessage(getString(R.string.home_toast_deleted_clips_format, selectedClips.size))
             }
         }
     }
@@ -212,9 +212,9 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
                     if (clips.isEmpty()) {
                         binding.tvEmptyMessage.text = if (searchQuery.isNotBlank()) {
-                            "No clips matching \"$searchQuery\""
+                            getString(R.string.home_empty_matching_format, searchQuery)
                         } else {
-                            "No clips saved yet"
+                            getString(R.string.home_empty_no_clips_saved)
                         }
                     }
                 }
@@ -225,7 +225,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     fun exportTxt() {
         val currentClips = adapter.currentList
         if (currentClips.isEmpty()) {
-            showMessage("No clips available to export")
+            showMessage(getString(R.string.home_export_no_clips_available))
             return
         }
         val timestamp = System.currentTimeMillis()
@@ -236,7 +236,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     fun clearUnpinned() {
         lifecycleScope.launch {
             repository.clearUnpinned()
-            showMessage("Cleared unpinned clips")
+            showMessage(getString(R.string.home_toast_cleared_unpinned))
         }
     }
 
@@ -250,7 +250,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)
         }
-        startActivity(Intent.createChooser(intent, "Share Clip"))
+        startActivity(Intent.createChooser(intent, getString(R.string.home_share_chooser_title)))
     }
 
     override fun onClipClick(clip: ClipEntity) {
@@ -262,7 +262,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     override fun onSelectionChanged(selectedCount: Int) {
-        binding.tvSelectionCount.text = "$selectedCount selected"
+        binding.tvSelectionCount.text = getString(R.string.home_selection_count_format, selectedCount)
         val inSelectionMode = selectedCount > 0
         binding.layoutSelectionBar.isVisible = inSelectionMode
         binding.fabAddClip.isVisible = !inSelectionMode
@@ -270,14 +270,14 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
     override fun onCopyClick(clip: ClipEntity) {
         ClipboardHelper.copyToClipboard(requireContext(), clip.content)
-        showMessage("Copied to clipboard!")
+        showMessage(getString(R.string.home_toast_copied_to_clipboard))
     }
 
     override fun onPinClick(clip: ClipEntity) {
         lifecycleScope.launch {
             val updated = clip.copy(isPinned = !clip.isPinned)
             repository.updateClip(updated)
-            showMessage(if (updated.isPinned) "Pinned clip" else "Unpinned clip")
+            showMessage(getString(if (updated.isPinned) R.string.home_toast_clip_pinned else R.string.home_toast_clip_unpinned))
         }
     }
 
@@ -295,14 +295,14 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     override fun onDeleteClick(clip: ClipEntity) {
         lifecycleScope.launch {
             repository.deleteClip(clip)
-            showMessage("Clip deleted")
+            showMessage(getString(R.string.home_toast_clip_deleted))
         }
     }
 
     override fun onSaveNewClip(text: String) {
         lifecycleScope.launch {
             repository.saveClipText(text)
-            showMessage("Saved clip!")
+            showMessage(getString(R.string.home_toast_clip_saved))
         }
     }
 
@@ -314,7 +314,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 wordCount = if (newContent.isBlank()) 0 else newContent.trim().split("\\s+".toRegex()).size
             )
             repository.updateClip(updated)
-            showMessage("Clip updated")
+            showMessage(getString(R.string.home_toast_clip_updated))
         }
     }
 
@@ -324,7 +324,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
     override fun onCopyClip(clip: ClipEntity) {
         ClipboardHelper.copyToClipboard(requireContext(), clip.content)
-        showMessage("Copied to clipboard!")
+        showMessage(getString(R.string.home_toast_copied_to_clipboard))
     }
 
     override fun onDestroyView() {

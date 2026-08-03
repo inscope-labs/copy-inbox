@@ -47,7 +47,7 @@ class CrashActivity : ComponentActivity() {
             // RecoveryActivity uses.
             Log.e(TAG, "Failed to initialize CrashActivity UI safely", t)
             try {
-                Toast.makeText(this, "An error occurred displaying the crash report.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.crash_fallback_toast), Toast.LENGTH_LONG).show()
             } catch (ignored: Throwable) {}
             finish()
         }
@@ -82,7 +82,7 @@ class CrashActivity : ComponentActivity() {
                 Toast.makeText(this, R.string.crash_copied, Toast.LENGTH_SHORT).show()
             } catch (t: Throwable) {
                 Log.e(TAG, "Failed to copy crash report", t)
-                Toast.makeText(this, "Failed to copy report", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.crash_copy_failed), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -97,7 +97,7 @@ class CrashActivity : ComponentActivity() {
                 finishAffinity()
             } catch (t: Throwable) {
                 Log.e(TAG, "Failed to restart application", t)
-                Toast.makeText(this, "Failed to restart application", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.crash_restart_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }

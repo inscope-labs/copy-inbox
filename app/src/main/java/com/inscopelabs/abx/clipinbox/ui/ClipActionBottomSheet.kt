@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.data.local.ClipEntity
 import com.inscopelabs.abx.clipinbox.databinding.BottomSheetClipActionsBinding
 import com.inscopelabs.abx.clipinbox.utils.TimeFormatter
@@ -54,7 +55,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupAddMode() {
-        binding.tvSheetTitle.text = "Add New Clip"
+        binding.tvSheetTitle.text = getString(R.string.sheet_title_add_new)
         binding.btnToggleEdit.isVisible = false
         binding.layoutMetadata.isVisible = false
 
@@ -62,30 +63,34 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
         binding.etClipContent.setText("")
         binding.etClipContent.requestFocus()
 
-        binding.btnSecondaryAction.text = "Cancel"
+        binding.btnSecondaryAction.text = getString(R.string.action_cancel)
         binding.btnSecondaryAction.setOnClickListener {
             dismiss()
         }
 
-        binding.btnPrimaryAction.text = "Save"
+        binding.btnPrimaryAction.text = getString(R.string.action_save)
         binding.btnPrimaryAction.setOnClickListener {
             val text = binding.etClipContent.text?.toString()?.trim().orEmpty()
             if (text.isNotBlank()) {
                 callback?.onSaveNewClip(text)
                 dismiss()
             } else {
-                Toast.makeText(context, "Clip content cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.sheet_error_empty_content), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setupViewMode(currentClip: ClipEntity) {
-        binding.tvSheetTitle.text = "Clip Details"
+        binding.tvSheetTitle.text = getString(R.string.sheet_title_clip_details)
         binding.btnToggleEdit.isVisible = true
         binding.layoutMetadata.isVisible = true
 
-        binding.tvSheetCategoryCounts.text =
-            "Category: ${currentClip.category} • ${currentClip.charCount} chars • ${currentClip.wordCount} words"
+        binding.tvSheetCategoryCounts.text = getString(
+            R.string.sheet_category_meta_format,
+            currentClip.category,
+            currentClip.charCount,
+            currentClip.wordCount
+        )
         binding.tvSheetTimestamp.text = TimeFormatter.formatDetailedTime(currentClip.timestamp)
 
         isEditing = false
@@ -113,7 +118,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
                     callback?.onUpdateClip(currentClip, newContent)
                     dismiss()
                 } else {
-                    Toast.makeText(context, "Content cannot be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.sheet_error_empty_content_short), Toast.LENGTH_SHORT).show()
                 }
             } else {
                 callback?.onCopyClip(currentClip)
@@ -124,21 +129,21 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
 
     private fun updateEditingState(currentClip: ClipEntity) {
         if (isEditing) {
-            binding.tvSheetTitle.text = "Edit Clip"
-            binding.btnToggleEdit.text = "Cancel"
+            binding.tvSheetTitle.text = getString(R.string.sheet_title_edit_clip)
+            binding.btnToggleEdit.text = getString(R.string.action_cancel)
             binding.etClipContent.isEnabled = true
             binding.etClipContent.setText(currentClip.content)
 
-            binding.btnSecondaryAction.text = "Cancel"
-            binding.btnPrimaryAction.text = "Save"
+            binding.btnSecondaryAction.text = getString(R.string.action_cancel)
+            binding.btnPrimaryAction.text = getString(R.string.action_save)
         } else {
-            binding.tvSheetTitle.text = "Clip Details"
-            binding.btnToggleEdit.text = "Edit"
+            binding.tvSheetTitle.text = getString(R.string.sheet_title_clip_details)
+            binding.btnToggleEdit.text = getString(R.string.action_edit)
             binding.etClipContent.isEnabled = false
             binding.etClipContent.setText(currentClip.content)
 
-            binding.btnSecondaryAction.text = "Share"
-            binding.btnPrimaryAction.text = "Copy"
+            binding.btnSecondaryAction.text = getString(R.string.action_share)
+            binding.btnPrimaryAction.text = getString(R.string.action_copy)
         }
     }
 

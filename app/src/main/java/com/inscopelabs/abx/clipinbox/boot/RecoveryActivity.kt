@@ -31,7 +31,7 @@ class RecoveryActivity : ComponentActivity() {
             // Even if layout inflates with errors, do not crash.
             // Provide a bare minimal fallback or finish to avoid boot loops.
             try {
-                Toast.makeText(this, "An error occurred displaying recovery UI.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.recovery_fallback_toast), Toast.LENGTH_LONG).show()
             } catch (ignored: Throwable) {}
             finish()
         }
@@ -110,7 +110,7 @@ class RecoveryActivity : ComponentActivity() {
                 Toast.makeText(this, R.string.recovery_copied, Toast.LENGTH_SHORT).show()
             } catch (t: Throwable) {
                 Log.e(TAG, "Failed to copy diagnostic report", t)
-                Toast.makeText(this, "Failed to copy report", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.recovery_copy_failed), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -126,7 +126,7 @@ class RecoveryActivity : ComponentActivity() {
                 finishAffinity()
             } catch (t: Throwable) {
                 Log.e(TAG, "Failed to restart application", t)
-                Toast.makeText(this, "Failed to restart application", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.recovery_restart_failed), Toast.LENGTH_SHORT).show()
             }
         }
     }
