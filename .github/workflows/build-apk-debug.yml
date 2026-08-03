@@ -23,10 +23,27 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Gradle
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.11.1'
+          gradle-version: "9.6.1"
+
+      - name: Ensure debug keystore exists
+        run: |
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair \
+              -keystore debug.keystore \
+              -storepass android \
+              -keypass android \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+            echo "Generated new debug.keystore for this run."
+          else
+            echo "debug.keystore already present, using it."
+          fi
 
       - name: Run JVM Tasks (Assemble, Test, Lint)
         run: gradle assembleDebug testDebugUnitTest lint
