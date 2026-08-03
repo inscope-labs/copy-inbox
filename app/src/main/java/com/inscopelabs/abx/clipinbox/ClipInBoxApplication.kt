@@ -8,6 +8,9 @@ import com.inscopelabs.abx.clipinbox.boot.BootGuard
 import com.inscopelabs.abx.clipinbox.boot.BootRoute
 import com.inscopelabs.abx.clipinbox.boot.RecoveryActivity
 import com.inscopelabs.abx.clipinbox.data.local.ClipboardDatabase
+import com.inscopelabs.abx.clipinbox.diagnostics.CrashReporterManager
+import com.inscopelabs.abx.clipinbox.diagnostics.DiagnosticsInitializer
+import com.inscopelabs.abx.clipinbox.diagnostics.GlobalExceptionHandler
 import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.domain.ClipRepositoryImpl
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
@@ -37,6 +40,10 @@ class ClipInBoxApplication : Application() {
 
         BootGuard.stageStart("app_init")
         try {
+            CrashReporterManager.initialize(this)
+            Thread.setDefaultUncaughtExceptionHandler(GlobalExceptionHandler(this))
+            DiagnosticsInitializer.initialize(this)
+
             val database = ClipboardDatabase.getDatabase(this)
             repository = ClipRepositoryImpl(database.clipDao())
 

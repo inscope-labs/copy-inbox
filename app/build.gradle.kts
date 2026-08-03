@@ -58,6 +58,17 @@ android {
     viewBinding = true
   }
   testOptions { unitTests { isIncludeAndroidResources = true } }
+  sourceSets {
+    getByName("main") {
+      java.srcDirs("src/main/java")
+    }
+    getByName("debug") {
+      java.srcDirs("src/debug/java")
+    }
+    getByName("release") {
+      java.srcDirs("src/release/java")
+    }
+  }
 }
 
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
