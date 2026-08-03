@@ -27,6 +27,8 @@ object TimeFormatter {
         }
     }
 
+    fun shortRelative(timestamp: Long): String = formatRelativeTime(timestamp)
+
     fun formatDetailedTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("EEE, MMM d, yyyy 'at' hh:mm a", Locale.getDefault())
         return sdf.format(Date(timestamp))

@@ -6,6 +6,15 @@ import android.content.Context
 import android.webkit.URLUtil
 
 object ClipboardHelper {
+    fun read(context: Context): String? = getPrimaryClipText(context)
+
+    fun extractText(data: ClipData): String? {
+        if (data.itemCount > 0) {
+            return data.getItemAt(0).coerceToText(null)?.toString()
+        }
+        return null
+    }
+
     fun getPrimaryClipText(context: Context): String? {
         val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
         val clipData = clipboardManager?.primaryClip
