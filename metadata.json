@@ -1,0 +1,6 @@
+{
+  "name": "Copy Inbox",
+  "description": "A quick clipboard manager, snippet collector, and copy inbox for Android.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
