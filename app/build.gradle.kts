@@ -11,7 +11,7 @@ plugins {
 
 android {
   namespace = "com.inscopelabs.abx.clipinbox"
-  compileSdk { version = release(36) { minorApiLevel = 1 } }
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.aistudio.copyinbox.qxmpzq"
