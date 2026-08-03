@@ -7,4 +7,9 @@ object HashGenerator {
         val bytes = MessageDigest.getInstance("SHA-256").digest(input.trim().toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }
     }
+
+    fun sha1(input: String): String {
+        val bytes = MessageDigest.getInstance("SHA-1").digest(input.trim().toByteArray())
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
 }

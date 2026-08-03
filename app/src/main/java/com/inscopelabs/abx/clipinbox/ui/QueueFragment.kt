@@ -76,11 +76,10 @@ class QueueFragment : Fragment() {
         }
 
         class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val text: android.widget.TextView? = itemView.findViewById(R.id.queue_item_text)
+
             fun bind(entity: QueueEntity) {
-                // Real binding lives in the layout's data-binding setup.
-                // Stubbed here so the file compiles standalone.
-                @Suppress("UNUSED_VARIABLE")
-                val _ignored = entity
+                text?.text = entity.suggestedName
             }
         }
     }

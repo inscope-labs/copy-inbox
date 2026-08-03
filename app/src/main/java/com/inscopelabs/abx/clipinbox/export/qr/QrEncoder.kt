@@ -1,50 +1,67 @@
 package com.inscopelabs.abx.clipinbox.export.qr
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
+import com.inscopelabs.abx.clipinbox.diagnostics.Logger
+import com.inscopelabs.abx.clipinbox.utils.HashGenerator
 
-class QrEncoder {
+/**
+ * Encodes arbitrary clip content into a Bitmap QR code.
+ *
+ * Feature 1 — QR Generator. The output is always square; callers pick a
+ * size in pixels and a preset (which controls error correction).
+ */
+class QrEncoder(
+    private val writer: QRCodeWriter = QRCodeWriter(),
+) {
+
     fun encode(content: String, sizePx: Int, preset: QrPresetType = QrPresetType.STANDARD): Bitmap {
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-
-        val bgPaint = Paint().apply {
-            color = if (preset == QrPresetType.INVERTED) Color.BLACK else Color.WHITE
-        }
-        val fgPaint = Paint().apply {
-            color = if (preset == QrPresetType.INVERTED) Color.WHITE else Color.BLACK
-        }
-
-        canvas.drawRect(0f, 0f, sizePx.toFloat(), sizePx.toFloat(), bgPaint)
-
-        val modules = 21
-        val cellSize = sizePx / modules.toFloat()
-        val hash = content.hashCode()
-
-        for (row in 0 until modules) {
-            for (col in 0 until modules) {
-                val isFinderPattern = (row < 7 && col < 7) || (row < 7 && col >= modules - 7) || (row >= modules - 7 && col < 7)
-                val fillCell = if (isFinderPattern) {
-                    val r = if (row >= modules - 7) row - (modules - 7) else row
-                    val c = if (col >= modules - 7) col - (modules - 7) else col
-                    (r == 0 || r == 6 || c == 0 || c == 6) || (r in 2..4 && c in 2..4)
-                } else {
-                    ((hash xor (row * 31 + col * 17)) and 1) == 0
-                }
-
-                if (fillCell) {
-                    canvas.drawRect(
-                        col * cellSize,
-                        row * cellSize,
-                        (col + 1) * cellSize,
-                        (row + 1) * cellSize,
-                        fgPaint
-                    )
-                }
+        require(sizePx in MIN_SIZE..MAX_SIZE) { "sizePx out of range" }
+        Logger.i("QrEncoder", "Encoding QR code ($sizePx x $sizePx) preset=${preset.name} contentLen=${content.length}")
+        val hints = hintsFor(preset)
+        val matrix = writer.encode(content, BarcodeFormat.QR_CODE, sizePx, sizePx, hints)
+        val bmp = Bitmap.createBitmap(matrix.width, matrix.height, Bitmap.Config.ARGB_8888)
+        for (x in 0 until matrix.width) {
+            for (y in 0 until matrix.height) {
+                bmp.setPixel(x, y, if (matrix[x, y]) Color.BLACK else Color.WHITE)
             }
         }
-        return bitmap
+        return bmp
+    }
+
+    fun suggestFileName(content: String, preset: QrPresetType): String {
+        val sig = HashGenerator.sha1(content).take(SIGNATURE_LEN)
+        val filename = "qr-${preset.name.lowercase()}-$sig.png"
+        Logger.d("QrEncoder", "Suggested QR filename $filename")
+        return filename
+    }
+
+    private fun hintsFor(preset: QrPresetType): Map<EncodeHintType, Any> = when (preset) {
+        QrPresetType.COMPACT -> mapOf(
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.L,
+            EncodeHintType.MARGIN to 1,
+        )
+        QrPresetType.STANDARD -> mapOf(
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
+            EncodeHintType.MARGIN to 2,
+        )
+        QrPresetType.ROBUST -> mapOf(
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.H,
+            EncodeHintType.MARGIN to 2,
+        )
+        QrPresetType.PRINT -> mapOf(
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.Q,
+            EncodeHintType.MARGIN to 4,
+        )
+    }
+
+    companion object {
+        private const val MIN_SIZE = 96
+        private const val MAX_SIZE = 2048
+        private const val SIGNATURE_LEN = 10
     }
 }
