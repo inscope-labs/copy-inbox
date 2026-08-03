@@ -55,6 +55,7 @@ android {
   buildFeatures {
     compose = true
     buildConfig = true
+    viewBinding = true
   }
   testOptions { unitTests { isIncludeAndroidResources = true } }
 }
@@ -71,6 +72,11 @@ googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.W
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  implementation(libs.androidx.appcompat)
+  implementation(libs.material)
+  implementation(libs.androidx.fragment.ktx)
+  implementation(libs.androidx.recyclerview)
+  implementation(libs.androidx.constraintlayout)
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   // implementation(libs.accompanist.permissions)
