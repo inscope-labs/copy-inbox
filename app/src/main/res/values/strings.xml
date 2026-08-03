@@ -67,6 +67,8 @@
     <string name="home_toast_clip_pinned">Pinned clip</string>
     <string name="home_toast_clip_unpinned">Unpinned clip</string>
     <string name="home_toast_clip_deleted">Clip deleted</string>
+    <string name="home_toast_clip_archived">Clip archived</string>
+    <string name="home_action_undo">Undo</string>
     <string name="home_toast_clip_saved">Saved clip!</string>
     <string name="home_toast_clip_updated">Clip updated</string>
 

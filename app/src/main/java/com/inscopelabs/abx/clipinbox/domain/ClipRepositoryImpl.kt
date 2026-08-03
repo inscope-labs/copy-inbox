@@ -2,6 +2,7 @@ package com.inscopelabs.abx.clipinbox.domain
 
 import com.inscopelabs.abx.clipinbox.data.local.ClipDao
 import com.inscopelabs.abx.clipinbox.data.local.ClipEntity
+import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.utils.ClipboardHelper
 import com.inscopelabs.abx.clipinbox.utils.HashGenerator
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,8 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
 
     override fun getAllClips(): Flow<List<ClipEntity>> = clipDao.getAllClips()
 
+    override fun getInboxClips(): Flow<List<ClipEntity>> = clipDao.getAllClips()
+
     override fun searchClips(query: String): Flow<List<ClipEntity>> = clipDao.searchClips(query)
 
     override fun getClipsByCategory(category: String): Flow<List<ClipEntity>> = clipDao.getClipsByCategory(category)
@@ -17,14 +20,20 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
     override fun getFavoriteClips(): Flow<List<ClipEntity>> = clipDao.getFavoriteClips()
 
     override suspend fun saveClipText(text: String, category: String?): Boolean {
-        if (text.isBlank()) return false
+        if (text.isBlank()) {
+            Logger.d("ClipRepositoryImpl", "saveClipText ignored: text is blank")
+            return false
+        }
         val trimmedText = text.trim()
         val hash = HashGenerator.sha256(trimmedText)
 
         val existing = clipDao.getClipByHash(hash)
         if (existing != null) {
+            Logger.i("ClipRepositoryImpl", "saveClipText updating existing clip hash: $hash")
             val updated = existing.copy(
-                timestamp = System.currentTimeMillis()
+                timestamp = System.currentTimeMillis(),
+                isRead = false,
+                isArchived = false
             )
             clipDao.updateClip(updated)
             return true
@@ -35,25 +44,44 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
             content = trimmedText,
             contentHash = hash,
             category = detectedCategory,
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            isArchived = false,
+            isRead = false
         )
-        clipDao.insertClip(newClip)
+        val newId = clipDao.insertClip(newClip)
+        Logger.i("ClipRepositoryImpl", "saveClipText inserted new clip id: $newId, category: $detectedCategory")
         return true
     }
 
     override suspend fun updateClip(clip: ClipEntity) {
+        Logger.d("ClipRepositoryImpl", "updateClip id: ${clip.id}")
         clipDao.updateClip(clip)
     }
 
+    override suspend fun archiveClip(clip: ClipEntity) {
+        Logger.i("ClipRepositoryImpl", "archiveClip id: ${clip.id}")
+        clipDao.updateClip(clip.copy(isArchived = true))
+    }
+
+    override suspend fun markRead(clip: ClipEntity) {
+        if (!clip.isRead) {
+            Logger.d("ClipRepositoryImpl", "markRead id: ${clip.id}")
+            clipDao.updateClip(clip.copy(isRead = true))
+        }
+    }
+
     override suspend fun deleteClip(clip: ClipEntity) {
+        Logger.i("ClipRepositoryImpl", "deleteClip id: ${clip.id}")
         clipDao.deleteClip(clip)
     }
 
     override suspend fun clearAll() {
+        Logger.w("ClipRepositoryImpl", "clearAll triggered")
         clipDao.clearAll()
     }
 
     override suspend fun clearUnpinned() {
+        Logger.i("ClipRepositoryImpl", "clearUnpinned triggered")
         clipDao.clearUnpinned()
     }
 }

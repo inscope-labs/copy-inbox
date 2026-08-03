@@ -10,19 +10,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ClipDao {
-    @Query("SELECT * FROM clips ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM clips WHERE isArchived = 0 ORDER BY isPinned DESC, timestamp DESC")
     fun getAllClips(): Flow<List<ClipEntity>>
 
-    @Query("SELECT * FROM clips WHERE content LIKE '%' || :query || '%' ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND content LIKE '%' || :query || '%' ORDER BY isPinned DESC, timestamp DESC")
     fun searchClips(query: String): Flow<List<ClipEntity>>
 
-    @Query("SELECT * FROM clips WHERE category = :category ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND category = :category ORDER BY isPinned DESC, timestamp DESC")
     fun getClipsByCategory(category: String): Flow<List<ClipEntity>>
 
-    @Query("SELECT * FROM clips WHERE isFavorite = 1 ORDER BY isPinned DESC, timestamp DESC")
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND isFavorite = 1 ORDER BY isPinned DESC, timestamp DESC")
     fun getFavoriteClips(): Flow<List<ClipEntity>>
 
-    @Query("SELECT * FROM clips WHERE isPinned = 1 ORDER BY timestamp DESC")
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND isPinned = 1 ORDER BY timestamp DESC")
     fun getPinnedClips(): Flow<List<ClipEntity>>
 
     @Query("SELECT * FROM clips WHERE contentHash = :hash LIMIT 1")

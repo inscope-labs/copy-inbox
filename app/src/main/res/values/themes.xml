@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#2196F3</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#E3F2FD</item>
-        <item name="colorOnPrimaryContainer">#0D47A1</item>
+    <style name="Theme.ClipInBox" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/cta_button</item>
+        <item name="colorOnPrimary">@color/color_white</item>
+        <item name="colorPrimaryContainer">@color/gray_surface_container</item>
+        <item name="colorOnPrimaryContainer">@color/gray_on_surface</item>
+        <item name="android:windowBackground">@color/gray_surface</item>
+        <item name="colorSurface">@color/gray_surface</item>
+        <item name="colorOnSurface">@color/gray_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/gray_on_surface_variant</item>
+        <item name="colorOutline">@color/gray_outline</item>
+        <item name="colorOutlineVariant">@color/gray_outline_variant</item>
     </style>
 
     <style name="Theme.Translucent" parent="Theme.Material3.DayNight.NoActionBar">

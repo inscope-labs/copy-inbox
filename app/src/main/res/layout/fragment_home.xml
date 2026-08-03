@@ -16,6 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:startIconDrawable="@android:drawable/ic_menu_search"
+            app:boxStrokeColor="@color/periwinkle"
+            app:hintTextColor="@color/periwinkle_text"
             android:hint="Search clips...">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -23,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
+                android:textColor="@color/gray_on_surface"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -47,6 +50,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="All"
                     android:checked="true" />
 
@@ -55,6 +59,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="Favorites" />
 
                 <com.google.android.material.chip.Chip
@@ -62,6 +67,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="Text" />
 
                 <com.google.android.material.chip.Chip
@@ -69,6 +75,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="Link" />
 
                 <com.google.android.material.chip.Chip
@@ -76,6 +83,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="Code" />
 
                 <com.google.android.material.chip.Chip
@@ -83,6 +91,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:chipStrokeColor="@color/periwinkle"
                     android:text="Note" />
 
             </com.google.android.material.chip.ChipGroup>
@@ -94,7 +103,8 @@
             style="@style/Widget.Material3.CardView.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/gray_surface_container">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -105,10 +115,12 @@
 
                 <Button
                     android:id="@+id/btnCaptureClipboard"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@color/cta_button"
+                    android:textColor="@color/color_white"
                     android:text="Capture Clipboard" />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
@@ -116,6 +128,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
+                    app:trackTint="@color/switch_track"
+                    android:textColor="@color/gray_on_surface"
                     android:text="Persistent Pin" />
 
             </LinearLayout>
@@ -200,7 +214,7 @@
                 <ImageView
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:src="@android:drawable/ic_menu_edit" />
+                    android:src="@drawable/ic_inbox_empty" />
 
                 <TextView
                     android:id="@+id/tvEmptyMessage"
@@ -209,14 +223,16 @@
                     android:text="No clips saved yet"
                     android:textSize="16sp"
                     android:layout_marginTop="16dp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textColor="@color/gray_on_surface_variant" />
 
                 <Button
                     android:id="@+id/btnAddFirstClip"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/cta_button"
+                    android:textColor="@color/color_white"
                     android:text="Add Your First Clip" />
 
             </LinearLayout>
@@ -233,6 +249,8 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Add Clip"
+        app:backgroundTint="@color/cta_button"
+        app:tint="@color/color_white"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -4,7 +4,7 @@
         <activity
             android:name=".diagnostics.LogViewerActivity"
             android:exported="false"
-            android:theme="@style/Theme.MyApplication" />
+            android:theme="@style/Theme.ClipInBox" />
 
         <service
             android:name=".diagnostics.DiagnosticService"

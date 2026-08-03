@@ -2,6 +2,8 @@ package com.inscopelabs.abx.clipinbox.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -10,16 +12,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
 import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.data.local.ClipEntity
 import com.inscopelabs.abx.clipinbox.databinding.FragmentHomeBinding
+import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.export.FileExporter
 import com.inscopelabs.abx.clipinbox.utils.ClipboardHelper
@@ -40,6 +46,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     private var searchQuery = ""
     private var selectedCategory = "All"
     private var collectJob: Job? = null
+    private var latestClips: List<ClipEntity> = emptyList()
 
     private val createDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("text/plain")
@@ -48,7 +55,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             val clipsToExport = if (adapter.isSelectionMode()) {
                 adapter.getSelectedClips()
             } else {
-                adapter.currentList
+                latestClips
             }
 
             if (clipsToExport.isNotEmpty()) {
@@ -59,6 +66,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                         adapter.clearSelection()
                     }
                 } catch (e: Exception) {
+                    Logger.e("HomeFragment", "Export failed", e)
                     showMessage(getString(R.string.home_export_failed_format, e.message.orEmpty()))
                 }
             } else {
@@ -72,17 +80,20 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Logger.d("HomeFragment", "onCreateView")
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Logger.d("HomeFragment", "onViewCreated")
 
         val app = requireActivity().application as ClipInBoxApplication
         repository = app.repository
 
         setupRecyclerView()
+        setupSwipeGestures()
         setupSearch()
         setupCategoryChips()
         setupCaptureButton()
@@ -99,6 +110,109 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         binding.recyclerViewClips.adapter = adapter
     }
 
+    private fun setupSwipeGestures() {
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                if (viewHolder is ClipListAdapter.HeaderViewHolder) return 0
+                return super.getSwipeDirs(recyclerView, viewHolder)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.bindingAdapterPosition
+                val item = adapter.currentList.getOrNull(position) as? ClipListItem.Clip ?: return
+                val clip = item.clip
+
+                if (direction == ItemTouchHelper.RIGHT) {
+                    lifecycleScope.launch {
+                        repository.archiveClip(clip)
+                        Logger.i("HomeFragment", "Clip ${clip.id} archived via swipe right")
+                        val view = _binding?.root ?: return@launch
+                        Snackbar.make(view, getString(R.string.home_toast_clip_archived), Snackbar.LENGTH_LONG)
+                            .setAction(getString(R.string.home_action_undo)) {
+                                lifecycleScope.launch {
+                                    repository.updateClip(clip.copy(isArchived = false))
+                                    Logger.i("HomeFragment", "Clip ${clip.id} restored from archive")
+                                }
+                            }
+                            .show()
+                    }
+                } else if (direction == ItemTouchHelper.LEFT) {
+                    lifecycleScope.launch {
+                        repository.deleteClip(clip)
+                        Logger.i("HomeFragment", "Clip ${clip.id} deleted via swipe left")
+                        val view = _binding?.root ?: return@launch
+                        Snackbar.make(view, getString(R.string.home_toast_clip_deleted), Snackbar.LENGTH_LONG)
+                            .setAction(getString(R.string.home_action_undo)) {
+                                lifecycleScope.launch {
+                                    repository.updateClip(clip)
+                                    Logger.i("HomeFragment", "Clip ${clip.id} restored from deletion")
+                                }
+                            }
+                            .show()
+                    }
+                }
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val background = ColorDrawable()
+                val archiveIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_archive)
+                val deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+
+                if (dX > 0) {
+                    background.color = ContextCompat.getColor(requireContext(), R.color.pastel_green_archive)
+                    background.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
+                    background.draw(c)
+
+                    archiveIcon?.let { icon ->
+                        val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
+                        val iconTop = itemView.top + iconMargin
+                        val iconBottom = iconTop + icon.intrinsicHeight
+                        val iconLeft = itemView.left + iconMargin
+                        val iconRight = itemView.left + iconMargin + icon.intrinsicWidth
+                        icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        icon.draw(c)
+                    }
+                } else if (dX < 0) {
+                    background.color = ContextCompat.getColor(requireContext(), R.color.pastel_red_delete)
+                    background.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                    background.draw(c)
+
+                    deleteIcon?.let { icon ->
+                        val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
+                        val iconTop = itemView.top + iconMargin
+                        val iconBottom = iconTop + icon.intrinsicHeight
+                        val iconRight = itemView.right - iconMargin
+                        val iconLeft = itemView.right - iconMargin - icon.intrinsicWidth
+                        icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        icon.draw(c)
+                    }
+                }
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+        }
+
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.recyclerViewClips)
+    }
+
     private fun setupSearch() {
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -111,7 +225,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     private fun setupCategoryChips() {
-        binding.chipGroupCategories.setOnCheckedStateChangeListener { group, checkedIds ->
+        binding.chipGroupCategories.setOnCheckedStateChangeListener { _, checkedIds ->
             val checkedId = checkedIds.firstOrNull()
             selectedCategory = when (checkedId) {
                 R.id.chip_favorites -> "Favorites"
@@ -121,6 +235,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 R.id.chip_note -> "Note"
                 else -> "All"
             }
+            Logger.d("HomeFragment", "Selected category filter: $selectedCategory")
             observeClips()
         }
     }
@@ -202,11 +317,12 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                     searchQuery.isNotBlank() -> repository.searchClips(searchQuery)
                     selectedCategory == "Favorites" -> repository.getFavoriteClips()
                     selectedCategory != "All" -> repository.getClipsByCategory(selectedCategory)
-                    else -> repository.getAllClips()
+                    else -> repository.getInboxClips()
                 }
 
                 flow.collectLatest { clips ->
-                    adapter.submitList(clips)
+                    latestClips = clips
+                    adapter.submitClips(clips)
                     binding.recyclerViewClips.isVisible = clips.isNotEmpty()
                     binding.layoutEmptyState.isVisible = clips.isEmpty()
 
@@ -223,8 +339,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     fun exportTxt() {
-        val currentClips = adapter.currentList
-        if (currentClips.isEmpty()) {
+        if (latestClips.isEmpty()) {
             showMessage(getString(R.string.home_export_no_clips_available))
             return
         }
@@ -254,6 +369,9 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     override fun onClipClick(clip: ClipEntity) {
+        lifecycleScope.launch {
+            repository.markRead(clip)
+        }
         val sheet = ClipActionBottomSheet.newInstance(clip, this)
         sheet.show(childFragmentManager, ClipActionBottomSheet.TAG)
     }

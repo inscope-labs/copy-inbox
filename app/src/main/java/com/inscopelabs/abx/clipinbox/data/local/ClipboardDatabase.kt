@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [ClipEntity::class], version = 1, exportSchema = false)
+@Database(entities = [ClipEntity::class], version = 2, exportSchema = false)
 abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun clipDao(): ClipDao
 
@@ -13,13 +15,23 @@ abstract class ClipboardDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ClipboardDatabase? = null
 
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE clips ADD COLUMN isArchived INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE clips ADD COLUMN isRead INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
         fun getDatabase(context: Context): ClipboardDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ClipboardDatabase::class.java,
                     "clipinbox_db"
-                ).fallbackToDestructiveMigration().build()
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

@@ -12,6 +12,8 @@ data class ClipEntity(
     val category: String = "Text",
     val isPinned: Boolean = false,
     val isFavorite: Boolean = false,
+    val isArchived: Boolean = false,
+    val isRead: Boolean = true,
     val timestamp: Long = System.currentTimeMillis(),
     val charCount: Int = content.length,
     val wordCount: Int = if (content.isBlank()) 0 else content.trim().split("\\s+".toRegex()).size
