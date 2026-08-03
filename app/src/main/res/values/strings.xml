@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Copy Inbox</string>
+    <string name="recovery_unknown_stage">Unknown Stage</string>
+    <string name="recovery_unknown_message">Unknown Error</string>
+    <string name="recovery_copied">Report copied to clipboard</string>
+    <string name="recovery_title">System Recovery</string>
+    <string name="recovery_subtitle">A boot failure was detected. Diagnostic details are listed below.</string>
+    <string name="recovery_stage_label">Failure Stage</string>
+    <string name="recovery_message_label">Failure Message</string>
+    <string name="recovery_device_label">Device Info</string>
+    <string name="recovery_stack_label">Stack Trace</string>
+    <string name="recovery_copy_button">Copy Diagnostic Report</string>
+    <string name="recovery_retry_button">Retry / Restart</string>
 </resources>

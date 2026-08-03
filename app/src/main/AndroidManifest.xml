@@ -36,6 +36,12 @@
             android:exported="false"
             android:theme="@style/Theme.Translucent" />
 
+        <activity
+            android:name=".boot.RecoveryActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.MyApplication" />
+
         <service
             android:name=".service.ClipboardTileService"
             android:exported="true"
