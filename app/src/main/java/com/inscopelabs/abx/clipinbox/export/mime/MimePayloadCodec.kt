@@ -1,12 +1,9 @@
 package com.inscopelabs.abx.clipinbox.export.mime
 
 import android.os.Bundle
+import android.os.Parcel
 import android.os.Parcelable
 import com.inscopelabs.abx.clipinbox.diagnostics.Logger
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.util.Base64
 
 /**
@@ -44,19 +41,21 @@ object MimePayloadCodec {
 
     fun encodeParcelable(value: Parcelable): String {
         Logger.d("MimePayloadCodec", "Encoding parcelable")
-        val baos = ByteArrayOutputStream()
-        ObjectOutputStream(baos).use { it.writeObject(value) }
-        return Base64.getEncoder().encodeToString(baos.toByteArray())
+        val parcel = Parcel.obtain()
+        return try {
+            value.writeToParcel(parcel, 0)
+            Base64.getEncoder().encodeToString(parcel.marshall())
+        } finally {
+            parcel.recycle()
+        }
     }
 
-    fun decodeParcelable(encoded: String): Parcelable? {
-        Logger.d("MimePayloadCodec", "Decoding parcelable")
-        return runCatching {
-            val raw = Base64.getDecoder().decode(encoded)
-            ObjectInputStream(ByteArrayInputStream(raw)).use { it.readObject() as Parcelable }
-        }.getOrElse { error ->
-            Logger.w("MimePayloadCodec", "Failed to decode parcelable: ${error.message}")
-            null
-        }
+    @Suppress("unused")
+    fun decodeParcelable(encoded: String): Nothing {
+        throw UnsupportedOperationException(
+            "decodeParcelable requires a type-specific Parcelable.Creator. " +
+            "Use Parcel.obtain(), setDataAndSize(bytes, bytes.size), then " +
+            "YourType.CREATOR.createFromParcel(parcel) at the call site."
+        )
     }
 }
