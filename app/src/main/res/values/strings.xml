@@ -102,4 +102,16 @@
 
     <!-- QueueFragment -->
     <string name="queue_dispatch_label">Send Pending</string>
+
+    <!-- QrFragment -->
+    <string name="qr_preview_content_description">QR code preview</string>
+    <string name="qr_generate_button">Generate QR</string>
+    <string name="qr_share_button">Share QR Code</string>
+    <string name="qr_empty_hint">Copy text to clipboard, then tap Generate</string>
+    <string name="qr_empty_clipboard">Nothing on the clipboard to encode</string>
+    <string name="qr_share_chooser_title">Share QR Code</string>
+    <string name="menu_qr_generator">QR Generator</string>
+
+    <!-- Debug Menu -->
+    <string name="menu_view_logs">View Logs</string>
 </resources>

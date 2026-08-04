@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_toolbar_menu, menu)
+        DebugMenuInflater.inflate(menuInflater, menu!!)
         return true
     }
 
@@ -62,7 +63,15 @@ class MainActivity : AppCompatActivity() {
                 fragment?.clearUnpinned()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            R.id.action_qr_generator -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, QrFragment())
+                    .addToBackStack("qr")
+                    .commit()
+                true
+            }
+            else -> if (DebugMenuHandler.handle(item, this)) true
+                    else super.onOptionsItemSelected(item)
         }
     }
 

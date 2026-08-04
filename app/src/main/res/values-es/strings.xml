@@ -97,4 +97,16 @@
     <string name="notification_content_text">Quick clipboard capture ready</string>
     <string name="notification_channel_name">ClipInBox Shortcut</string>
     <string name="notification_channel_desc">Dismissible notification shortcut to quickly capture clipboard text</string>
+
+    <!-- QrFragment -->
+    <string name="qr_preview_content_description">Vista previa del código QR</string>
+    <string name="qr_generate_button">Generar QR</string>
+    <string name="qr_share_button">Compartir código QR</string>
+    <string name="qr_empty_hint">Copie texto al portapapeles y luego toque Generar</string>
+    <string name="qr_empty_clipboard">No hay nada en el portapapeles para codificar</string>
+    <string name="qr_share_chooser_title">Compartir código QR</string>
+    <string name="menu_qr_generator">Generador QR</string>
+
+    <!-- Debug Menu -->
+    <string name="menu_view_logs">Ver registros</string>
 </resources>

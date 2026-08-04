@@ -1,15 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/gray_surface">
 
-    <ImageView
-        android:id="@+id/qr_preview"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:contentDescription="QR Code Preview" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@color/section_header_bg"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
+            android:text="QR Generator"
+            android:textColor="@color/color_white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/gray_surface_container"
+            app:cardCornerRadius="12dp"
+            app:strokeColor="@color/gray_outline_variant">
+
+            <ImageView
+                android:id="@+id/qr_preview"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:contentDescription="@string/qr_preview_content_description"
+                android:scaleType="centerInside" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_preset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_compact"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Compact"
+                app:checkedIconTint="@color/periwinkle_dark"
+                app:chipStrokeColor="@color/periwinkle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_standard"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Standard"
+                app:checkedIconTint="@color/periwinkle_dark"
+                app:chipStrokeColor="@color/periwinkle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_robust"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Robust"
+                app:checkedIconTint="@color/periwinkle_dark"
+                app:chipStrokeColor="@color/periwinkle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_print"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Print"
+                app:checkedIconTint="@color/periwinkle_dark"
+                app:chipStrokeColor="@color/periwinkle" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <Button
+            android:id="@+id/btn_generate"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/cta_button"
+            android:text="@string/qr_generate_button"
+            android:textColor="@color/color_white" />
+
+        <Button
+            android:id="@+id/btn_share_qr"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/qr_share_button"
+            android:textColor="@color/primary"
+            android:visibility="gone"
+            app:strokeColor="@color/periwinkle" />
+
+        <TextView
+            android:id="@+id/tv_empty_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/qr_empty_hint"
+            android:textColor="@color/gray_on_surface_variant"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
