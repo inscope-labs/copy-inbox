@@ -125,4 +125,13 @@
     <string name="session_token_expired">Session token expired — reconnect</string>
     <string name="menu_session">abx-server Session</string>
     <string name="session_token_empty">Token must not be empty</string>
+
+    <!-- SettingsFragment -->
+    <string name="settings_persistent_notification">Persistent notification</string>
+    <string name="settings_overlay_enable">Enable floating overlay</string>
+    <string name="settings_overlay_permission_required">Overlay permission required</string>
+    <string name="settings_grant_overlay_permission">Grant Permission</string>
+    <string name="settings_auto_clear">Auto-clear sensitive clips</string>
+    <string name="settings_auto_clear_delay_value">45 seconds</string>
+    <string name="menu_settings">Settings</string>
 </resources>

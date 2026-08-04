@@ -120,4 +120,13 @@
     <string name="session_token_expired">Jeton de session expiré — se reconnecter</string>
     <string name="menu_session">Session abx-server</string>
     <string name="session_token_empty">Le jeton ne doit pas être vide</string>
+
+    <!-- SettingsFragment -->
+    <string name="settings_persistent_notification">Notification permanente</string>
+    <string name="settings_overlay_enable">Activer la superposition flottante</string>
+    <string name="settings_overlay_permission_required">Autorisation de superposition requise</string>
+    <string name="settings_grant_overlay_permission">Accorder l\'autorisation</string>
+    <string name="settings_auto_clear">Effacer auto. les extraits sensibles</string>
+    <string name="settings_auto_clear_delay_value">45 secondes</string>
+    <string name="menu_settings">Paramètres</string>
 </resources>

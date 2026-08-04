@@ -120,4 +120,13 @@
     <string name="session_token_expired">Token de sesión expirado — reconectar</string>
     <string name="menu_session">Sesión abx-server</string>
     <string name="session_token_empty">El token no debe estar vacío</string>
+
+    <!-- SettingsFragment -->
+    <string name="settings_persistent_notification">Notificación persistente</string>
+    <string name="settings_overlay_enable">Habilitar superposición flotante</string>
+    <string name="settings_overlay_permission_required">Permiso de superposición requerido</string>
+    <string name="settings_grant_overlay_permission">Conceder permiso</string>
+    <string name="settings_auto_clear">Borrar automáticamente clips sensibles</string>
+    <string name="settings_auto_clear_delay_value">45 segundos</string>
+    <string name="menu_settings">Ajustes</string>
 </resources>

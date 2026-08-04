@@ -77,6 +77,13 @@ class MainActivity : AppCompatActivity() {
                     .commit()
                 true
             }
+            R.id.action_settings -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, SettingsFragment())
+                    .addToBackStack("settings")
+                    .commit()
+                true
+            }
             else -> if (DebugMenuHandler.handle(item, this)) true
                     else super.onOptionsItemSelected(item)
         }

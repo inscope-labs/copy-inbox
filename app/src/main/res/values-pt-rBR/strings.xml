@@ -120,4 +120,13 @@
     <string name="session_token_expired">Token de sessão expirado — reconectar</string>
     <string name="menu_session">Sessão abx-server</string>
     <string name="session_token_empty">O token não pode estar vazio</string>
+
+    <!-- SettingsFragment -->
+    <string name="settings_persistent_notification">Notificação permanente</string>
+    <string name="settings_overlay_enable">Ativar sobreposição flutuante</string>
+    <string name="settings_overlay_permission_required">Permissão de sobreposição necessária</string>
+    <string name="settings_grant_overlay_permission">Conceder permissão</string>
+    <string name="settings_auto_clear">Limpeza automática de trechos sensíveis</string>
+    <string name="settings_auto_clear_delay_value">45 segundos</string>
+    <string name="menu_settings">Configurações</string>
 </resources>
