@@ -84,6 +84,13 @@ class MainActivity : AppCompatActivity() {
                     .commit()
                 true
             }
+            R.id.action_storage_paths -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, StoragePathsFragment())
+                    .addToBackStack("storage_paths")
+                    .commit()
+                true
+            }
             else -> if (DebugMenuHandler.handle(item, this)) true
                     else super.onOptionsItemSelected(item)
         }

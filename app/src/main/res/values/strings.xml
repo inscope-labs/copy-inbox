@@ -134,4 +134,13 @@
     <string name="settings_auto_clear">Auto-clear sensitive clips</string>
     <string name="settings_auto_clear_delay_value">45 seconds</string>
     <string name="menu_settings">Settings</string>
+
+    <!-- StoragePathsFragment -->
+    <string name="storage_add_folder">Add Folder</string>
+    <string name="storage_add_macro">Add Naming Macro</string>
+    <string name="storage_delete_confirm">Delete?</string>
+    <string name="storage_macro_label_hint">Macro name</string>
+    <string name="storage_macro_template_hint">Template e.g. clip_{date}_{seq}</string>
+    <string name="storage_macro_tokens_help">Tokens: {date} {time} {type} {index} {seq} {hash}</string>
+    <string name="menu_storage_paths">Storage Paths</string>
 </resources>

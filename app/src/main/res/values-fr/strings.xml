@@ -129,4 +129,13 @@
     <string name="settings_auto_clear">Effacer auto. les extraits sensibles</string>
     <string name="settings_auto_clear_delay_value">45 secondes</string>
     <string name="menu_settings">Paramètres</string>
+
+    <!-- StoragePathsFragment -->
+    <string name="storage_add_folder">Ajouter un dossier</string>
+    <string name="storage_add_macro">Ajouter une macro de nom</string>
+    <string name="storage_delete_confirm">Supprimer ?</string>
+    <string name="storage_macro_label_hint">Nom de la macro</string>
+    <string name="storage_macro_template_hint">Modèle ex. clip_{date}_{seq}</string>
+    <string name="storage_macro_tokens_help">Jetons : {date} {time} {type} {index} {seq} {hash}</string>
+    <string name="menu_storage_paths">Chemins de stockage</string>
 </resources>

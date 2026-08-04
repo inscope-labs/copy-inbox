@@ -129,4 +129,13 @@
     <string name="settings_auto_clear">Borrar automáticamente clips sensibles</string>
     <string name="settings_auto_clear_delay_value">45 segundos</string>
     <string name="menu_settings">Ajustes</string>
+
+    <!-- StoragePathsFragment -->
+    <string name="storage_add_folder">Añadir carpeta</string>
+    <string name="storage_add_macro">Añadir macro de nombre</string>
+    <string name="storage_delete_confirm">¿Eliminar?</string>
+    <string name="storage_macro_label_hint">Nombre de macro</string>
+    <string name="storage_macro_template_hint">Plantilla p. ej. clip_{date}_{seq}</string>
+    <string name="storage_macro_tokens_help">Tokens: {date} {time} {type} {index} {seq} {hash}</string>
+    <string name="menu_storage_paths">Rutas de almacenamiento</string>
 </resources>
