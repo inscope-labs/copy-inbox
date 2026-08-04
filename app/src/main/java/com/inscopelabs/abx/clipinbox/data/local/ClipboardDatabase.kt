@@ -9,10 +9,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueDao
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
 
-@Database(entities = [ClipEntity::class, QueueEntity::class], version = 3, exportSchema = false)
+@Database(
+    entities = [ClipEntity::class, QueueEntity::class, SafPath::class, NamingMacro::class],
+    version = 4,
+    exportSchema = false
+)
 abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun clipDao(): ClipDao
     abstract fun queueDao(): QueueDao
+    abstract fun safPathDao(): SafPathDao
+    abstract fun namingMacroDao(): NamingMacroDao
 
     companion object {
         @Volatile
@@ -46,6 +52,32 @@ abstract class ClipboardDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `saf_paths` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `label` TEXT NOT NULL,
+                      `treeUri` TEXT NOT NULL,
+                      `lastUsedAt` INTEGER NOT NULL DEFAULT 0,
+                      `seqCounter` INTEGER NOT NULL DEFAULT 0
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `naming_macros` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `label` TEXT NOT NULL,
+                      `template` TEXT NOT NULL,
+                      `createdAt` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun getDatabase(context: Context): ClipboardDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -53,7 +85,7 @@ abstract class ClipboardDatabase : RoomDatabase() {
                     ClipboardDatabase::class.java,
                     "clipinbox_db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

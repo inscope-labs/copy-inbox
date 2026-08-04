@@ -21,6 +21,7 @@ import com.inscopelabs.abx.clipinbox.export.connector.AbxMailboxConnector
 import com.inscopelabs.abx.clipinbox.export.connector.EncryptedSessionStore
 import com.inscopelabs.abx.clipinbox.export.connector.FileManagerConnector
 import com.inscopelabs.abx.clipinbox.export.connector.SessionGate
+import com.inscopelabs.abx.clipinbox.export.saf.SafPathRepository
 import com.inscopelabs.abx.clipinbox.security.AutoClearScheduler
 import com.inscopelabs.abx.clipinbox.security.SensitiveClipPolicy
 import com.inscopelabs.abx.clipinbox.service.ClipboardWatcher
@@ -40,6 +41,9 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var connector: FileManagerConnector
+        private set
+
+    lateinit var safPathRepository: SafPathRepository
         private set
 
     lateinit var clipboardWatcher: ClipboardWatcher
@@ -81,6 +85,12 @@ class ClipInBoxApplication : Application() {
 
             connector = AbxMailboxConnector(sessionGate)
             Logger.i("ClipInBoxApplication", "Initialized AbxMailboxConnector")
+
+            safPathRepository = SafPathRepository(
+                database.safPathDao(),
+                database.namingMacroDao(),
+            )
+            Logger.i("ClipInBoxApplication", "Initialized SafPathRepository")
 
             val policy = SensitiveClipPolicy()
             val classifier = ClipClassifier()
