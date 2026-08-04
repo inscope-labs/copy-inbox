@@ -138,4 +138,14 @@
     <string name="storage_macro_template_hint">Plantilla p. ej. clip_{date}_{seq}</string>
     <string name="storage_macro_tokens_help">Tokens: {date} {time} {type} {index} {seq} {hash}</string>
     <string name="menu_storage_paths">Rutas de almacenamiento</string>
+
+    <!-- Contextual actions & SaveToPath -->
+    <string name="action_save_to_disk">Guardar en disco</string>
+    <string name="action_cancel_selection">Cancelar selección</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="save_to_path_title">Guardar en carpeta</string>
+    <string name="save_no_paths_message">Aún no hay carpetas configuradas. Añada una primero.</string>
+    <string name="save_success">%1$d archivo(s) guardado(s)</string>
+    <string name="save_partial_failure">%1$d de %2$d archivos guardados</string>
+    <string name="save_filename_preview">Nombre de archivo: %1$s</string>
 </resources>

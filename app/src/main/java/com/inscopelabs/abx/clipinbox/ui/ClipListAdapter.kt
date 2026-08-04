@@ -1,6 +1,5 @@
 package com.inscopelabs.abx.clipinbox.ui
 
-import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -96,6 +95,10 @@ class ClipListAdapter(
         return originalClips.filter { selectedIds.contains(it.id) }
     }
 
+    fun getSelectedIds(): List<Long> {
+        return selectedIds.toList()
+    }
+
     fun clearSelection() {
         if (selectedIds.isNotEmpty()) {
             selectedIds.clear()
@@ -144,13 +147,31 @@ class ClipListAdapter(
         fun bind(clip: ClipEntity) {
             val context = binding.root.context
             val isSelected = selectedIds.contains(clip.id)
+            val inSelectionMode = isSelectionMode()
 
-            binding.ivSelectionCheck.isVisible = isSelected
-            binding.cardClip.strokeWidth = if (isSelected) 6 else 2
+            binding.cbSelect.isVisible = inSelectionMode
+            binding.cbSelect.isChecked = isSelected
 
-            binding.chipCategory.text = clip.category
+            val strokePx = (context.resources.displayMetrics.density * (if (isSelected) 4 else 2)).toInt()
+            binding.cardClip.strokeWidth = strokePx
+
+            binding.tvCategoryLabel.text = clip.category
             binding.tvTime.text = TimeFormatter.formatRelativeTime(clip.timestamp)
             binding.tvContent.text = clip.content
+
+            if (!clip.isRead) {
+                binding.tvContent.setTypeface(
+                    if (clip.category == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
+                    Typeface.BOLD
+                )
+                binding.tvContent.setTextColor(ContextCompat.getColor(context, R.color.gray_on_surface))
+            } else {
+                binding.tvContent.setTypeface(
+                    if (clip.category == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
+                    Typeface.NORMAL
+                )
+                binding.tvContent.setTextColor(ContextCompat.getColor(context, R.color.gray_on_surface_variant))
+            }
 
             binding.viewUnreadDot.isVisible = !clip.isRead
 
@@ -161,27 +182,7 @@ class ClipListAdapter(
                 "Favorites" -> android.R.drawable.btn_star_big_on
                 else -> android.R.drawable.ic_menu_sort_by_size
             }
-            binding.ivCategoryBadge.setImageResource(iconRes)
-
-            if (clip.category == "Code") {
-                binding.tvContent.typeface = Typeface.MONOSPACE
-            } else {
-                binding.tvContent.typeface = Typeface.DEFAULT
-            }
-
-            binding.tvMetaCounts.text = context.getString(
-                R.string.clip_item_meta_counts_format,
-                clip.charCount,
-                clip.wordCount
-            )
-
-            binding.btnPin.setImageResource(
-                if (clip.isPinned) android.R.drawable.ic_menu_today else android.R.drawable.ic_menu_agenda
-            )
-
-            binding.btnFavorite.setImageResource(
-                if (clip.isFavorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off
-            )
+            binding.ivCategoryIcon.setImageResource(iconRes)
 
             binding.cardClip.setOnClickListener {
                 if (isSelectionMode()) {
@@ -196,12 +197,6 @@ class ClipListAdapter(
                 listener.onClipLongClick(clip)
                 true
             }
-
-            binding.btnCopy.setOnClickListener { listener.onCopyClick(clip) }
-            binding.btnPin.setOnClickListener { listener.onPinClick(clip) }
-            binding.btnFavorite.setOnClickListener { listener.onFavoriteClick(clip) }
-            binding.btnShare.setOnClickListener { listener.onShareClick(clip) }
-            binding.btnDelete.setOnClickListener { listener.onDeleteClick(clip) }
         }
     }
 

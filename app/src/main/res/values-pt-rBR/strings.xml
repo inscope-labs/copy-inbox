@@ -138,4 +138,14 @@
     <string name="storage_macro_template_hint">Modelo ex. clip_{date}_{seq}</string>
     <string name="storage_macro_tokens_help">Tokens: {date} {time} {type} {index} {seq} {hash}</string>
     <string name="menu_storage_paths">Caminhos de armazenamento</string>
+
+    <!-- Contextual actions & SaveToPath -->
+    <string name="action_save_to_disk">Salvar no disco</string>
+    <string name="action_cancel_selection">Cancelar seleção</string>
+    <string name="action_delete">Excluir</string>
+    <string name="save_to_path_title">Salvar na pasta</string>
+    <string name="save_no_paths_message">Nenhuma pasta configurada. Adicione uma primeiro.</string>
+    <string name="save_success">%1$d arquivo(s) salvo(s)</string>
+    <string name="save_partial_failure">%1$d de %2$d arquivos salvos</string>
+    <string name="save_filename_preview">Nome do arquivo: %1$s</string>
 </resources>

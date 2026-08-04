@@ -19,6 +19,11 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
 
     override fun getFavoriteClips(): Flow<List<ClipEntity>> = clipDao.getFavoriteClips()
 
+    override suspend fun getClipById(id: Long): ClipEntity? {
+        Logger.d("ClipRepositoryImpl", "getClipById id: $id")
+        return clipDao.getClipById(id)
+    }
+
     override suspend fun saveClipText(text: String, category: String?): Boolean {
         if (text.isBlank()) {
             Logger.d("ClipRepositoryImpl", "saveClipText ignored: text is blank")

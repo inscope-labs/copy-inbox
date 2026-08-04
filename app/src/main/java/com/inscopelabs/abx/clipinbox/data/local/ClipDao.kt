@@ -28,6 +28,9 @@ interface ClipDao {
     @Query("SELECT * FROM clips WHERE contentHash = :hash LIMIT 1")
     suspend fun getClipByHash(hash: String): ClipEntity?
 
+    @Query("SELECT * FROM clips WHERE id = :id LIMIT 1")
+    suspend fun getClipById(id: Long): ClipEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertClip(clip: ClipEntity): Long
 

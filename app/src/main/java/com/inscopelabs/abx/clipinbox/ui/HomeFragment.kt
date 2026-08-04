@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -285,27 +286,45 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     private fun setupSelectionBar() {
-        binding.btnCloseSelection.setOnClickListener {
+        binding.btnCancelSelection.setOnClickListener {
             adapter.clearSelection()
         }
-        binding.btnExportSelected.setOnClickListener {
+        binding.btnActionCopy.setOnClickListener {
             val selectedClips = adapter.getSelectedClips()
             if (selectedClips.isEmpty()) {
                 showMessage(getString(R.string.home_toast_no_clips_selected))
                 return@setOnClickListener
             }
-            val timestamp = System.currentTimeMillis()
-            val filename = "clipinbox-selected-export-$timestamp.txt"
-            createDocumentLauncher.launch(filename)
+            val textToCopy = selectedClips.first().content
+            ClipboardHelper.copyToClipboard(requireContext(), textToCopy)
+            showMessage(getString(R.string.home_toast_copied_to_clipboard))
         }
-        binding.btnDeleteSelected.setOnClickListener {
+        binding.btnActionDelete.setOnClickListener {
             val selectedClips = adapter.getSelectedClips()
             if (selectedClips.isEmpty()) return@setOnClickListener
-            lifecycleScope.launch {
-                selectedClips.forEach { repository.deleteClip(it) }
-                adapter.clearSelection()
-                showMessage(getString(R.string.home_toast_deleted_clips_format, selectedClips.size))
+            AlertDialog.Builder(requireContext())
+                .setTitle(R.string.storage_delete_confirm)
+                .setMessage(getString(R.string.home_toast_deleted_clips_format, selectedClips.size))
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    lifecycleScope.launch {
+                        for (clip in selectedClips) {
+                            repository.deleteClip(clip)
+                        }
+                        adapter.clearSelection()
+                        showMessage(getString(R.string.home_toast_deleted_clips_format, selectedClips.size))
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+        binding.btnActionSave.setOnClickListener {
+            val ids = adapter.getSelectedIds().toLongArray()
+            if (ids.isEmpty()) {
+                showMessage(getString(R.string.home_toast_no_clips_selected))
+                return@setOnClickListener
             }
+            SaveToPathBottomSheet.newInstance(ids)
+                .show(parentFragmentManager, "save_to_path")
         }
     }
 
@@ -380,10 +399,15 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     }
 
     override fun onSelectionChanged(selectedCount: Int) {
-        binding.tvSelectionCount.text = getString(R.string.home_selection_count_format, selectedCount)
-        val inSelectionMode = selectedCount > 0
-        binding.layoutSelectionBar.isVisible = inSelectionMode
-        binding.fabAddClip.isVisible = !inSelectionMode
+        if (selectedCount > 0) {
+            binding.llContextualBar.isVisible = true
+            binding.tvSelectionCount.text = getString(R.string.home_selection_count_format, selectedCount)
+            binding.fabAddClip.isVisible = false
+        } else {
+            binding.llContextualBar.isVisible = false
+            binding.fabAddClip.isVisible = true
+            adapter.clearSelection()
+        }
     }
 
     override fun onCopyClick(clip: ClipEntity) {

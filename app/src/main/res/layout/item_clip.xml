@@ -9,167 +9,97 @@
     app:cardBackgroundColor="@color/gray_surface_container"
     app:cardCornerRadius="12dp"
     app:strokeColor="@color/gray_outline_variant"
-    app:strokeWidth="1dp">
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:minHeight="64dp"
         android:gravity="center_vertical"
-        android:padding="12dp">
+        android:orientation="horizontal"
+        android:padding="0dp">
 
-        <!-- Selection Check Indicator (multi-select mode) -->
-        <ImageView
-            android:id="@+id/ivSelectionCheck"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/checkbox_on_background"
-            android:visibility="gone"
-            android:layout_marginEnd="10dp" />
+        <CheckBox
+            android:id="@+id/cb_select"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="0dp"
+            android:buttonTint="@color/periwinkle_dark"
+            android:paddingStart="8dp"
+            android:visibility="gone" />
 
-        <!-- Category Badge Icon (circular, tinted per category) -->
         <FrameLayout
-            android:id="@+id/layoutCategoryBadge"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:id="@+id/fl_badge"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/ic_launcher_background">
+            android:background="@drawable/ic_launcher_background"
+            app:backgroundTint="@color/gray_surface_container">
 
             <ImageView
-                android:id="@+id/ivCategoryBadge"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:id="@+id/iv_category_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_menu_edit"
+                android:contentDescription="@null"
                 app:tint="@color/periwinkle_dark" />
 
         </FrameLayout>
 
-        <!-- Content Preview Block -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-            <!-- Category & Time header row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipCategory"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Text"
-                    android:textSize="11sp"
-                    app:chipMinHeight="26dp"
-                    app:chipStrokeColor="@color/periwinkle"
-                    app:chipBackgroundColor="@color/gray_surface"
-                    android:textColor="@color/periwinkle_text" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Just now"
-                    android:textSize="11sp"
-                    android:textColor="@color/gray_on_surface_variant" />
-
-                <!-- Unread Indicator Dot -->
-                <View
-                    android:id="@+id/viewUnreadDot"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/ic_launcher_background"
-                    android:backgroundTint="@color/pastel_blue_dot"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-            <!-- Content preview text -->
-            <TextView
-                android:id="@+id/tvContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:textSize="14sp"
-                android:textColor="@color/gray_on_surface" />
-
-            <!-- Footer Meta & Actions -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/tvMetaCounts"
+                    android:id="@+id/tv_category_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="0 chars • 0 words"
-                    android:textSize="10sp"
-                    android:textColor="@color/gray_on_surface_variant" />
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/gray_on_surface"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/btnCopy"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_send"
-                    app:tint="@color/gray_outline"
-                    android:contentDescription="Copy" />
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/gray_on_surface_variant"
+                    android:textSize="11sp" />
 
-                <ImageButton
-                    android:id="@+id/btnPin"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_today"
-                    app:tint="@color/gray_outline"
-                    android:contentDescription="Pin" />
-
-                <ImageButton
-                    android:id="@+id/btnFavorite"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/btn_star_big_off"
-                    app:tint="@color/gray_outline"
-                    android:contentDescription="Favorite" />
-
-                <ImageButton
-                    android:id="@+id/btnShare"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_share"
-                    app:tint="@color/gray_outline"
-                    android:contentDescription="Share" />
-
-                <ImageButton
-                    android:id="@+id/btnDelete"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_delete"
-                    app:tint="@color/gray_outline"
-                    android:contentDescription="Delete" />
+                <View
+                    android:id="@+id/view_unread_dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/ic_launcher_background"
+                    app:backgroundTint="@color/pastel_blue_dot" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/gray_on_surface_variant"
+                android:textSize="13sp" />
 
         </LinearLayout>
 

@@ -138,4 +138,14 @@
     <string name="storage_macro_template_hint">Modèle ex. clip_{date}_{seq}</string>
     <string name="storage_macro_tokens_help">Jetons : {date} {time} {type} {index} {seq} {hash}</string>
     <string name="menu_storage_paths">Chemins de stockage</string>
+
+    <!-- Contextual actions & SaveToPath -->
+    <string name="action_save_to_disk">Enregistrer sur le disque</string>
+    <string name="action_cancel_selection">Annuler la sélection</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="save_to_path_title">Enregistrer dans le dossier</string>
+    <string name="save_no_paths_message">Aucun dossier configuré. Ajoutez-en un d\'abord.</string>
+    <string name="save_success">%1$d fichier(s) enregistré(s)</string>
+    <string name="save_partial_failure">%1$d fichier(s) sur %2$d enregistré(s)</string>
+    <string name="save_filename_preview">Nom du fichier : %1$s</string>
 </resources>

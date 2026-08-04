@@ -136,57 +136,64 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Multi-Selection Bar -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/layoutSelectionBar"
-            style="@style/Widget.Material3.CardView.Elevated"
+        <!-- Contextual Action Bar -->
+        <LinearLayout
+            android:id="@+id/ll_contextual_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/section_header_bg"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:visibility="gone">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tv_selection_count"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="8dp">
+                android:layout_weight="1"
+                android:textColor="@color/color_white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/btnCloseSelection"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:contentDescription="Close Selection" />
+            <ImageButton
+                android:id="@+id/btn_action_save"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_save_to_disk"
+                android:src="@android:drawable/ic_menu_save"
+                app:tint="@color/color_white" />
 
-                <TextView
-                    android:id="@+id/tvSelectionCount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="0 selected"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp" />
+            <ImageButton
+                android:id="@+id/btn_action_copy"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_copy"
+                android:src="@android:drawable/ic_menu_send"
+                app:tint="@color/color_white" />
 
-                <Button
-                    android:id="@+id/btnExportSelected"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Export" />
+            <ImageButton
+                android:id="@+id/btn_action_delete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_delete"
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="@color/color_white" />
 
-                <Button
-                    android:id="@+id/btnDeleteSelected"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Delete"
-                    android:textColor="?attr/colorError" />
+            <ImageButton
+                android:id="@+id/btn_cancel_selection"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/action_cancel_selection"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="@color/color_white" />
 
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <!-- Main Content Area -->
         <FrameLayout

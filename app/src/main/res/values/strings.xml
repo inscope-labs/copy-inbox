@@ -143,4 +143,14 @@
     <string name="storage_macro_template_hint">Template e.g. clip_{date}_{seq}</string>
     <string name="storage_macro_tokens_help">Tokens: {date} {time} {type} {index} {seq} {hash}</string>
     <string name="menu_storage_paths">Storage Paths</string>
+
+    <!-- Contextual actions & SaveToPath -->
+    <string name="action_save_to_disk">Save to disk</string>
+    <string name="action_cancel_selection">Cancel selection</string>
+    <string name="action_delete">Delete</string>
+    <string name="save_to_path_title">Save to Folder</string>
+    <string name="save_no_paths_message">No folders set up yet. Add one first.</string>
+    <string name="save_success">Saved %1$d file(s)</string>
+    <string name="save_partial_failure">%1$d of %2$d files saved</string>
+    <string name="save_filename_preview">Filename: %1$s</string>
 </resources>
