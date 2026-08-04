@@ -16,6 +16,8 @@ import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.domain.ClipRepositoryImpl
 import com.inscopelabs.abx.clipinbox.domain.queue.ClipQueueManager
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueRepositoryImpl
+import com.inscopelabs.abx.clipinbox.export.connector.EncryptedSessionStore
+import com.inscopelabs.abx.clipinbox.export.connector.SessionGate
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
 
@@ -25,6 +27,9 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var queueRepository: ClipQueueManager.QueueRepository
+        private set
+
+    lateinit var sessionGate: SessionGate
         private set
 
     override fun onCreate() {
@@ -54,6 +59,9 @@ class ClipInBoxApplication : Application() {
             repository = ClipRepositoryImpl(database.clipDao())
             queueRepository = QueueRepositoryImpl(database.queueDao())
             Logger.i("ClipInBoxApplication", "Initialized ClipRepository and QueueRepository")
+
+            sessionGate = SessionGate(EncryptedSessionStore(this))
+            Logger.i("ClipInBoxApplication", "Initialized SessionGate")
 
             if (NotificationPreferences.isPersistentNotificationEnabled(this)) {
                 NotificationHelper.postTriggerNotification(this, true)

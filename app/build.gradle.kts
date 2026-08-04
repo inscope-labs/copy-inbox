@@ -79,6 +79,7 @@ dependencies {
   implementation(libs.material)
   implementation(libs.androidx.fragment.ktx)
   implementation(libs.androidx.recyclerview)
+  implementation(libs.androidx.security.crypto)
   implementation(libs.androidx.constraintlayout)
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
