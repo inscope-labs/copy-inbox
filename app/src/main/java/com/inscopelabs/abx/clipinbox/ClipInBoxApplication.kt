@@ -11,14 +11,20 @@ import com.inscopelabs.abx.clipinbox.data.local.ClipboardDatabase
 import com.inscopelabs.abx.clipinbox.diagnostics.CrashReporterManager
 import com.inscopelabs.abx.clipinbox.diagnostics.DiagnosticsInitializer
 import com.inscopelabs.abx.clipinbox.diagnostics.GlobalExceptionHandler
+import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.domain.ClipRepositoryImpl
+import com.inscopelabs.abx.clipinbox.domain.queue.ClipQueueManager
+import com.inscopelabs.abx.clipinbox.domain.queue.QueueRepositoryImpl
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
 
 class ClipInBoxApplication : Application() {
 
     lateinit var repository: ClipRepository
+        private set
+
+    lateinit var queueRepository: ClipQueueManager.QueueRepository
         private set
 
     override fun onCreate() {
@@ -46,6 +52,8 @@ class ClipInBoxApplication : Application() {
 
             val database = ClipboardDatabase.getDatabase(this)
             repository = ClipRepositoryImpl(database.clipDao())
+            queueRepository = QueueRepositoryImpl(database.queueDao())
+            Logger.i("ClipInBoxApplication", "Initialized ClipRepository and QueueRepository")
 
             if (NotificationPreferences.isPersistentNotificationEnabled(this)) {
                 NotificationHelper.postTriggerNotification(this, true)

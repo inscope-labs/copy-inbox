@@ -6,10 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.inscopelabs.abx.clipinbox.domain.queue.QueueDao
+import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
 
-@Database(entities = [ClipEntity::class], version = 2, exportSchema = false)
+@Database(entities = [ClipEntity::class, QueueEntity::class], version = 3, exportSchema = false)
 abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun clipDao(): ClipDao
+    abstract fun queueDao(): QueueDao
 
     companion object {
         @Volatile
@@ -22,6 +25,27 @@ abstract class ClipboardDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `queue` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `suggestedName` TEXT NOT NULL,
+                      `type` TEXT NOT NULL,
+                      `content` TEXT NOT NULL,
+                      `mime` TEXT,
+                      `sourceUri` TEXT,
+                      `createdAt` INTEGER NOT NULL,
+                      `attempts` INTEGER NOT NULL DEFAULT 0,
+                      `lastError` TEXT,
+                      `state` TEXT NOT NULL DEFAULT 'PENDING'
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun getDatabase(context: Context): ClipboardDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -29,7 +53,7 @@ abstract class ClipboardDatabase : RoomDatabase() {
                     ClipboardDatabase::class.java,
                     "clipinbox_db"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

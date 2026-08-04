@@ -99,4 +99,7 @@
     <string name="notification_content_text">Quick clipboard capture ready</string>
     <string name="notification_channel_name">ClipInBox Shortcut</string>
     <string name="notification_channel_desc">Dismissible notification shortcut to quickly capture clipboard text</string>
+
+    <!-- QueueFragment -->
+    <string name="queue_dispatch_label">Send Pending</string>
 </resources>

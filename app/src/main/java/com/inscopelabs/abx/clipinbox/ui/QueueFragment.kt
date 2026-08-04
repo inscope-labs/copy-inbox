@@ -4,14 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
 import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.domain.queue.ClipQueueManager
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
+import com.inscopelabs.abx.clipinbox.domain.queue.QueueRepositoryImpl
+import kotlinx.coroutines.launch
 
 /**
  * UI for the auto-save + batch queue.
@@ -20,7 +26,7 @@ import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
  */
 class QueueFragment : Fragment() {
 
-    private lateinit var manager: ClipQueueManager
+    private var manager: ClipQueueManager? = null
     private val adapter = QueueAdapter()
 
     override fun onCreateView(
@@ -35,7 +41,12 @@ class QueueFragment : Fragment() {
         list.adapter = adapter
         root.findViewById<View>(R.id.queue_dispatch).setOnClickListener {
             Logger.i("QueueFragment", "Dispatch pending clicked")
-            manager.dispatchPending()
+            val currentManager = manager
+            if (currentManager != null) {
+                currentManager.dispatchPending()
+            } else {
+                Logger.w("QueueFragment", "ClipQueueManager is not yet bound")
+            }
         }
         return root
     }
@@ -43,14 +54,25 @@ class QueueFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Logger.d("QueueFragment", "onResume")
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            // The actual data source is provided by the application's
-            // service locator; refresh() is called from the repository
-            // observer wiring. Kept as a hook for the integration PR.
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val app = activity?.application as? ClipInBoxApplication
+                val repo = app?.queueRepository as? QueueRepositoryImpl
+                if (repo != null) {
+                    Logger.d("QueueFragment", "Observing queue entities")
+                    repo.observeAll().collect { items ->
+                        Logger.d("QueueFragment", "Collected ${items.size} queue items")
+                        adapter.submit(items)
+                    }
+                } else {
+                    Logger.w("QueueFragment", "queueRepository is unavailable on Application")
+                }
+            }
         }
     }
 
     fun bind(manager: ClipQueueManager) {
+        Logger.i("QueueFragment", "bind ClipQueueManager")
         this.manager = manager
     }
 
@@ -76,10 +98,12 @@ class QueueFragment : Fragment() {
         }
 
         class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val text: android.widget.TextView? = itemView.findViewById(R.id.queue_item_text)
+            private val nameText: TextView? = itemView.findViewById(R.id.queue_item_name)
+            private val stateText: TextView? = itemView.findViewById(R.id.queue_item_state)
 
             fun bind(entity: QueueEntity) {
-                text?.text = entity.suggestedName
+                nameText?.text = entity.suggestedName
+                stateText?.text = entity.state.name
             }
         }
     }
