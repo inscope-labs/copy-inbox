@@ -14,12 +14,17 @@ import com.inscopelabs.abx.clipinbox.diagnostics.GlobalExceptionHandler
 import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.domain.ClipRepositoryImpl
+import com.inscopelabs.abx.clipinbox.domain.detect.ClipClassifier
 import com.inscopelabs.abx.clipinbox.domain.queue.ClipQueueManager
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueRepositoryImpl
 import com.inscopelabs.abx.clipinbox.export.connector.AbxMailboxConnector
 import com.inscopelabs.abx.clipinbox.export.connector.EncryptedSessionStore
 import com.inscopelabs.abx.clipinbox.export.connector.FileManagerConnector
 import com.inscopelabs.abx.clipinbox.export.connector.SessionGate
+import com.inscopelabs.abx.clipinbox.security.AutoClearScheduler
+import com.inscopelabs.abx.clipinbox.security.SensitiveClipPolicy
+import com.inscopelabs.abx.clipinbox.service.ClipboardWatcher
+import com.inscopelabs.abx.clipinbox.service.OtpAutoCapture
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
 
@@ -35,6 +40,12 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var connector: FileManagerConnector
+        private set
+
+    lateinit var clipboardWatcher: ClipboardWatcher
+        private set
+
+    lateinit var autoClearScheduler: AutoClearScheduler
         private set
 
     override fun onCreate() {
@@ -70,6 +81,17 @@ class ClipInBoxApplication : Application() {
 
             connector = AbxMailboxConnector(sessionGate)
             Logger.i("ClipInBoxApplication", "Initialized AbxMailboxConnector")
+
+            val policy = SensitiveClipPolicy()
+            val classifier = ClipClassifier()
+            val notificationHelper = NotificationHelper(this, NotificationPreferences(this))
+            val otpCapture = OtpAutoCapture(this, notificationHelper)
+            autoClearScheduler = AutoClearScheduler(this)
+            clipboardWatcher = ClipboardWatcher(
+                this, classifier, policy, otpCapture, autoClearScheduler
+            )
+            clipboardWatcher.install()
+            Logger.i("ClipInBoxApplication", "ClipboardWatcher installed")
 
             if (NotificationPreferences.isPersistentNotificationEnabled(this)) {
                 NotificationHelper.postTriggerNotification(this, true)

@@ -7,6 +7,7 @@ import android.os.Build
 import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.domain.detect.ClipClassifier
 import com.inscopelabs.abx.clipinbox.domain.detect.ClipType
+import com.inscopelabs.abx.clipinbox.security.AutoClearScheduler
 import com.inscopelabs.abx.clipinbox.security.SensitiveClipPolicy
 import com.inscopelabs.abx.clipinbox.utils.ClipSnapshot
 import com.inscopelabs.abx.clipinbox.utils.ClipboardHelper
@@ -26,6 +27,7 @@ class ClipboardWatcher(
     private val classifier: ClipClassifier,
     private val policy: SensitiveClipPolicy,
     private val otpCapture: OtpAutoCapture,
+    private val autoClearScheduler: AutoClearScheduler? = null,
 ) : ClipboardManager.OnPrimaryClipChangedListener {
 
     private val clipboard: ClipboardManager by lazy {
@@ -60,6 +62,7 @@ class ClipboardWatcher(
 
         if (policy.isSensitive(raw)) {
             Logger.w("ClipboardWatcher", "Clip content is sensitive, skipping classification/OTP")
+            autoClearScheduler?.scheduleClear()
             return
         }
 

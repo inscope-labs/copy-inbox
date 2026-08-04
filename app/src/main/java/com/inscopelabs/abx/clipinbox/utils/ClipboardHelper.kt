@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.URLUtil
+import com.inscopelabs.abx.clipinbox.security.AutoClearScheduler
 
 object ClipboardHelper {
     fun read(context: Context): String? = getPrimaryClipText(context)
@@ -35,6 +36,12 @@ object ClipboardHelper {
         return try {
             val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
             val clip = ClipData.newPlainText(label, text)
+            val extras = android.os.PersistableBundle()
+            extras.putString(
+                AutoClearScheduler.MARKER_KEY,
+                AutoClearScheduler.MARKER_VALUE,
+            )
+            clip.description.extras = extras
             clipboardManager?.setPrimaryClip(clip)
             true
         } catch (e: Exception) {
