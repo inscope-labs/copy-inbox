@@ -109,4 +109,15 @@
 
     <!-- Debug Menu -->
     <string name="menu_view_logs">Ver registros</string>
+
+    <!-- SessionFragment -->
+    <string name="session_disconnected">Nenhuma sessão ativa</string>
+    <string name="session_connected">Conectado</string>
+    <string name="session_mailbox_prefix">Caixa de correio: </string>
+    <string name="session_connect">Conectar</string>
+    <string name="session_disconnect">Desconectar</string>
+    <string name="session_token_hint">Colar token de sessão</string>
+    <string name="session_token_expired">Token de sessão expirado — reconectar</string>
+    <string name="menu_session">Sessão abx-server</string>
+    <string name="session_token_empty">O token não pode estar vazio</string>
 </resources>

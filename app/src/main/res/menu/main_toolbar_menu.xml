@@ -19,4 +19,10 @@
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/menu_qr_generator"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_session"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="@string/menu_session"
+        app:showAsAction="never" />
 </menu>

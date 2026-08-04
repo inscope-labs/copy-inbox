@@ -114,4 +114,15 @@
 
     <!-- Debug Menu -->
     <string name="menu_view_logs">View Logs</string>
+
+    <!-- SessionFragment -->
+    <string name="session_disconnected">No active session</string>
+    <string name="session_connected">Connected</string>
+    <string name="session_mailbox_prefix">Mailbox: </string>
+    <string name="session_connect">Connect</string>
+    <string name="session_disconnect">Disconnect</string>
+    <string name="session_token_hint">Paste session token</string>
+    <string name="session_token_expired">Session token expired — reconnect</string>
+    <string name="menu_session">abx-server Session</string>
+    <string name="session_token_empty">Token must not be empty</string>
 </resources>

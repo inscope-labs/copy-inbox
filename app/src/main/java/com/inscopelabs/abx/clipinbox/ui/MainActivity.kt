@@ -70,6 +70,13 @@ class MainActivity : AppCompatActivity() {
                     .commit()
                 true
             }
+            R.id.action_session -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, SessionFragment())
+                    .addToBackStack("session")
+                    .commit()
+                true
+            }
             else -> if (DebugMenuHandler.handle(item, this)) true
                     else super.onOptionsItemSelected(item)
         }

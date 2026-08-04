@@ -109,4 +109,15 @@
 
     <!-- Debug Menu -->
     <string name="menu_view_logs">Voir les journaux</string>
+
+    <!-- SessionFragment -->
+    <string name="session_disconnected">Aucune session active</string>
+    <string name="session_connected">Connecté</string>
+    <string name="session_mailbox_prefix">Boîte aux lettres: </string>
+    <string name="session_connect">Se connecter</string>
+    <string name="session_disconnect">Se déconnecter</string>
+    <string name="session_token_hint">Coller le jeton de session</string>
+    <string name="session_token_expired">Jeton de session expiré — se reconnecter</string>
+    <string name="menu_session">Session abx-server</string>
+    <string name="session_token_empty">Le jeton ne doit pas être vide</string>
 </resources>

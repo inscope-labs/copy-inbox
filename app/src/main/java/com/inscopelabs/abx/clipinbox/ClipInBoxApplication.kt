@@ -16,7 +16,9 @@ import com.inscopelabs.abx.clipinbox.domain.ClipRepository
 import com.inscopelabs.abx.clipinbox.domain.ClipRepositoryImpl
 import com.inscopelabs.abx.clipinbox.domain.queue.ClipQueueManager
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueRepositoryImpl
+import com.inscopelabs.abx.clipinbox.export.connector.AbxMailboxConnector
 import com.inscopelabs.abx.clipinbox.export.connector.EncryptedSessionStore
+import com.inscopelabs.abx.clipinbox.export.connector.FileManagerConnector
 import com.inscopelabs.abx.clipinbox.export.connector.SessionGate
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
@@ -30,6 +32,9 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var sessionGate: SessionGate
+        private set
+
+    lateinit var connector: FileManagerConnector
         private set
 
     override fun onCreate() {
@@ -62,6 +67,9 @@ class ClipInBoxApplication : Application() {
 
             sessionGate = SessionGate(EncryptedSessionStore(this))
             Logger.i("ClipInBoxApplication", "Initialized SessionGate")
+
+            connector = AbxMailboxConnector(sessionGate)
+            Logger.i("ClipInBoxApplication", "Initialized AbxMailboxConnector")
 
             if (NotificationPreferences.isPersistentNotificationEnabled(this)) {
                 NotificationHelper.postTriggerNotification(this, true)
