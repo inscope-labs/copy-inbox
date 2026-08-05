@@ -335,7 +335,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 val flow = when {
                     searchQuery.isNotBlank() -> repository.searchClips(searchQuery)
                     selectedCategory == "Favorites" -> repository.getFavoriteClips()
-                    selectedCategory != "All" -> repository.getClipsByCategory(selectedCategory)
+                    selectedCategory != "All" -> repository.getClipsByDetectedType(selectedCategory)
                     else -> repository.getInboxClips()
                 }
 

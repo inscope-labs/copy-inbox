@@ -87,7 +87,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
 
         binding.tvSheetCategoryCounts.text = getString(
             R.string.sheet_category_meta_format,
-            currentClip.category,
+            currentClip.detectedType,
             currentClip.charCount,
             currentClip.wordCount
         )

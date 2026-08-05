@@ -155,19 +155,19 @@ class ClipListAdapter(
             val strokePx = (context.resources.displayMetrics.density * (if (isSelected) 4 else 2)).toInt()
             binding.cardClip.strokeWidth = strokePx
 
-            binding.tvCategoryLabel.text = clip.category
+            binding.tvCategoryLabel.text = clip.detectedType
             binding.tvTime.text = TimeFormatter.formatRelativeTime(clip.timestamp)
             binding.tvContent.text = clip.content
 
             if (!clip.isRead) {
                 binding.tvContent.setTypeface(
-                    if (clip.category == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
+                    if (clip.detectedType == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
                     Typeface.BOLD
                 )
                 binding.tvContent.setTextColor(ContextCompat.getColor(context, R.color.gray_on_surface))
             } else {
                 binding.tvContent.setTypeface(
-                    if (clip.category == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
+                    if (clip.detectedType == "Code") Typeface.MONOSPACE else Typeface.DEFAULT,
                     Typeface.NORMAL
                 )
                 binding.tvContent.setTextColor(ContextCompat.getColor(context, R.color.gray_on_surface_variant))
@@ -175,7 +175,7 @@ class ClipListAdapter(
 
             binding.viewUnreadDot.isVisible = !clip.isRead
 
-            val iconRes = when (clip.category) {
+            val iconRes = when (clip.detectedType) {
                 "Link" -> android.R.drawable.ic_menu_compass
                 "Code" -> android.R.drawable.ic_menu_preferences
                 "Note" -> android.R.drawable.ic_menu_edit

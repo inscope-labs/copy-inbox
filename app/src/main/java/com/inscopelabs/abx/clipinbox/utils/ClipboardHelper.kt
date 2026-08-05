@@ -50,7 +50,7 @@ object ClipboardHelper {
         }
     }
 
-    fun detectCategory(text: String): String {
+    fun detectType(text: String): String {
         val trimmed = text.trim()
         if (URLUtil.isValidUrl(trimmed) || trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("www.")) {
             return "Link"

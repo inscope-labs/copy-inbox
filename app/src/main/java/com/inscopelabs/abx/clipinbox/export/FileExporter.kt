@@ -10,7 +10,7 @@ object FileExporter {
         context.contentResolver.openOutputStream(targetUri)?.use { outputStream ->
             val writer = outputStream.bufferedWriter()
             clips.forEachIndexed { index, clip ->
-                val header = "[${TimeFormatter.formatDetailedTime(clip.timestamp)}] (${clip.category})"
+                val header = "[${TimeFormatter.formatDetailedTime(clip.timestamp)}] (${clip.detectedType})"
                 writer.write(header)
                 writer.newLine()
                 writer.write(clip.content)

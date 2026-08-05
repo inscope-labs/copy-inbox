@@ -16,8 +16,14 @@ interface ClipDao {
     @Query("SELECT * FROM clips WHERE isArchived = 0 AND content LIKE '%' || :query || '%' ORDER BY isPinned DESC, timestamp DESC")
     fun searchClips(query: String): Flow<List<ClipEntity>>
 
-    @Query("SELECT * FROM clips WHERE isArchived = 0 AND category = :category ORDER BY isPinned DESC, timestamp DESC")
-    fun getClipsByCategory(category: String): Flow<List<ClipEntity>>
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND detectedType = :detectedType ORDER BY isPinned DESC, timestamp DESC")
+    fun getClipsByDetectedType(detectedType: String): Flow<List<ClipEntity>>
+
+    @Query("SELECT * FROM clips WHERE isArchived = 0 AND categoryId = :categoryId ORDER BY isPinned DESC, timestamp DESC")
+    fun getClipsByCategoryId(categoryId: Long): Flow<List<ClipEntity>>
+
+    @Query("UPDATE clips SET categoryId = :newCategoryId WHERE categoryId = :oldCategoryId")
+    suspend fun reassignCategory(oldCategoryId: Long, newCategoryId: Long)
 
     @Query("SELECT * FROM clips WHERE isArchived = 0 AND isFavorite = 1 ORDER BY isPinned DESC, timestamp DESC")
     fun getFavoriteClips(): Flow<List<ClipEntity>>

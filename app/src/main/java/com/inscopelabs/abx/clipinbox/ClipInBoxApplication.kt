@@ -7,6 +7,8 @@ import android.os.Bundle
 import com.inscopelabs.abx.clipinbox.boot.BootGuard
 import com.inscopelabs.abx.clipinbox.boot.BootRoute
 import com.inscopelabs.abx.clipinbox.boot.RecoveryActivity
+import com.inscopelabs.abx.clipinbox.category.CategoryRepository
+import com.inscopelabs.abx.clipinbox.category.CategoryRepositoryImpl
 import com.inscopelabs.abx.clipinbox.data.local.ClipboardDatabase
 import com.inscopelabs.abx.clipinbox.diagnostics.CrashReporterManager
 import com.inscopelabs.abx.clipinbox.diagnostics.DiagnosticsInitializer
@@ -28,6 +30,9 @@ import com.inscopelabs.abx.clipinbox.service.ClipboardWatcher
 import com.inscopelabs.abx.clipinbox.service.OtpAutoCapture
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ClipInBoxApplication : Application() {
 
@@ -44,6 +49,9 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var safPathRepository: SafPathRepository
+        private set
+
+    lateinit var categoryRepository: CategoryRepository
         private set
 
     lateinit var clipboardWatcher: ClipboardWatcher
@@ -91,6 +99,17 @@ class ClipInBoxApplication : Application() {
                 database.namingMacroDao(),
             )
             Logger.i("ClipInBoxApplication", "Initialized SafPathRepository")
+
+            categoryRepository = CategoryRepositoryImpl(database.categoryDao(), database.clipDao())
+            Logger.i("ClipInBoxApplication", "Initialized CategoryRepository")
+            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    categoryRepository.ensureSeedCategoryExists()
+                    Logger.i("ClipInBoxApplication", "Ensured seed category exists")
+                } catch (t: Throwable) {
+                    Logger.e("ClipInBoxApplication", "Failed to ensure seed category", t)
+                }
+            }
 
             val policy = SensitiveClipPolicy()
             val classifier = ClipClassifier()

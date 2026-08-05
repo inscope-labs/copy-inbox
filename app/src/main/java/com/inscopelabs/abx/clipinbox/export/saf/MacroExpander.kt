@@ -8,7 +8,7 @@ object MacroExpander {
     // Supported tokens:
     // {date}  — yyyyMMdd from clip.timestamp
     // {time}  — HHmmss from clip.timestamp
-    // {type}  — clip.category lowercased, spaces replaced with underscore
+    // {type}  — clip.detectedType lowercased, spaces replaced with underscore
     // {index} — zero-padded position in batch (e.g. "01", "02"); pass batchIndex
     // {seq}   — zero-padded path.seqCounter + batchIndex (so each file in a
     //           batch gets a unique seq within the same save operation)
@@ -25,7 +25,7 @@ object MacroExpander {
     ): String {
         val date = DATE_FMT.format(java.util.Date(clip.timestamp))
         val time = TIME_FMT.format(java.util.Date(clip.timestamp))
-        val type = clip.category.lowercase().replace(" ", "_")
+        val type = clip.detectedType.lowercase().replace(" ", "_")
         val index = batchIndex.toString().padStart(2, '0')
         val seq = (path.seqCounter + batchIndex).toString().padStart(4, '0')
         val hash = clip.contentHash.take(8)

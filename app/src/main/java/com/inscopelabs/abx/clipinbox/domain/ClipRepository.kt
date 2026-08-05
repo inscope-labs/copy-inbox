@@ -7,7 +7,7 @@ interface ClipRepository {
     fun getAllClips(): Flow<List<ClipEntity>>
     fun getInboxClips(): Flow<List<ClipEntity>>
     fun searchClips(query: String): Flow<List<ClipEntity>>
-    fun getClipsByCategory(category: String): Flow<List<ClipEntity>>
+    fun getClipsByDetectedType(detectedType: String): Flow<List<ClipEntity>>
     fun getFavoriteClips(): Flow<List<ClipEntity>>
     suspend fun getClipById(id: Long): ClipEntity?
     suspend fun saveClipText(text: String, category: String? = null): Boolean

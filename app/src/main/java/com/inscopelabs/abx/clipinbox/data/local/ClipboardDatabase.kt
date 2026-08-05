@@ -10,12 +10,13 @@ import com.inscopelabs.abx.clipinbox.domain.queue.QueueDao
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
 
 @Database(
-    entities = [ClipEntity::class, QueueEntity::class, SafPath::class, NamingMacro::class],
-    version = 4,
+    entities = [ClipEntity::class, CategoryEntity::class, QueueEntity::class, SafPath::class, NamingMacro::class],
+    version = 5,
     exportSchema = false
 )
 abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun clipDao(): ClipDao
+    abstract fun categoryDao(): CategoryDao
     abstract fun queueDao(): QueueDao
     abstract fun safPathDao(): SafPathDao
     abstract fun namingMacroDao(): NamingMacroDao
@@ -78,6 +79,61 @@ abstract class ClipboardDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val now = System.currentTimeMillis()
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `categories` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `name` TEXT NOT NULL,
+                      `colorHex` TEXT NOT NULL DEFAULT '#5B6EE8',
+                      `isDefault` INTEGER NOT NULL DEFAULT 0,
+                      `sortOrder` INTEGER NOT NULL DEFAULT 0,
+                      `createdAt` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    INSERT INTO `categories` (`name`, `colorHex`, `isDefault`, `sortOrder`, `createdAt`)
+                    VALUES ('Uncategorized', '#9E9E9E', 1, 0, $now)
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `clips_new` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `content` TEXT NOT NULL,
+                      `contentHash` TEXT NOT NULL,
+                      `detectedType` TEXT NOT NULL DEFAULT 'Text',
+                      `categoryId` INTEGER NOT NULL DEFAULT 0,
+                      `tags` TEXT NOT NULL DEFAULT '',
+                      `isPinned` INTEGER NOT NULL DEFAULT 0,
+                      `isFavorite` INTEGER NOT NULL DEFAULT 0,
+                      `isArchived` INTEGER NOT NULL DEFAULT 0,
+                      `isRead` INTEGER NOT NULL DEFAULT 1,
+                      `timestamp` INTEGER NOT NULL,
+                      `charCount` INTEGER NOT NULL,
+                      `wordCount` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    INSERT INTO `clips_new` (`id`, `content`, `contentHash`, `detectedType`, `categoryId`, `tags`, `isPinned`, `isFavorite`, `isArchived`, `isRead`, `timestamp`, `charCount`, `wordCount`)
+                    SELECT `id`, `content`, `contentHash`, `category` AS `detectedType`,
+                           (SELECT `id` FROM `categories` WHERE `isDefault` = 1 LIMIT 1) AS `categoryId`,
+                           '' AS `tags`,
+                           `isPinned`, `isFavorite`, `isArchived`, `isRead`, `timestamp`, `charCount`, `wordCount`
+                    FROM `clips`
+                    """.trimIndent()
+                )
+                db.execSQL("DROP TABLE `clips` ")
+                db.execSQL("ALTER TABLE `clips_new` RENAME TO `clips` ")
+            }
+        }
+
         fun getDatabase(context: Context): ClipboardDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -85,7 +141,7 @@ abstract class ClipboardDatabase : RoomDatabase() {
                     ClipboardDatabase::class.java,
                     "clipinbox_db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

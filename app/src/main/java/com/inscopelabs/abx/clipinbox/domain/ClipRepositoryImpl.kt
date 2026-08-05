@@ -15,7 +15,7 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
 
     override fun searchClips(query: String): Flow<List<ClipEntity>> = clipDao.searchClips(query)
 
-    override fun getClipsByCategory(category: String): Flow<List<ClipEntity>> = clipDao.getClipsByCategory(category)
+    override fun getClipsByDetectedType(detectedType: String): Flow<List<ClipEntity>> = clipDao.getClipsByDetectedType(detectedType)
 
     override fun getFavoriteClips(): Flow<List<ClipEntity>> = clipDao.getFavoriteClips()
 
@@ -44,17 +44,17 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
             return true
         }
 
-        val detectedCategory = category ?: ClipboardHelper.detectCategory(trimmedText)
+        val detectedType = category ?: ClipboardHelper.detectType(trimmedText)
         val newClip = ClipEntity(
             content = trimmedText,
             contentHash = hash,
-            category = detectedCategory,
+            detectedType = detectedType,
             timestamp = System.currentTimeMillis(),
             isArchived = false,
             isRead = false
         )
         val newId = clipDao.insertClip(newClip)
-        Logger.i("ClipRepositoryImpl", "saveClipText inserted new clip id: $newId, category: $detectedCategory")
+        Logger.i("ClipRepositoryImpl", "saveClipText inserted new clip id: $newId, detectedType: $detectedType")
         return true
     }
 
