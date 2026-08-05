@@ -114,6 +114,14 @@
             android:hint="Content" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+        android:id="@+id/btn_find_replace"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/find_replace_title" />
+
     <!-- Actions Row -->
     <LinearLayout
         android:layout_width="match_parent"

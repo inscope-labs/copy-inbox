@@ -27,17 +27,24 @@ import com.inscopelabs.abx.clipinbox.export.saf.SafExporter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+import android.text.Editable
+import android.text.TextWatcher
+import com.google.android.material.textfield.TextInputEditText
+
 class SaveToPathBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var rvPathChoices: RecyclerView
     private lateinit var spinnerMacro: Spinner
-    private lateinit var tvFilenamePreview: TextView
+    private lateinit var etFilenamePreview: TextInputEditText
     private lateinit var btnSaveConfirm: Button
 
     private var selectedPath: SafPath? = null
     private var selectedMacro: NamingMacro? = null
     private var firstClip: ClipEntity? = null
     private var clipIds: LongArray = longArrayOf()
+    private var isFilenameManuallyEdited = false
+
+    private var filenameTextWatcher: TextWatcher? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,8 +67,21 @@ class SaveToPathBottomSheet : BottomSheetDialogFragment() {
 
         rvPathChoices = view.findViewById(R.id.rv_path_choices)
         spinnerMacro = view.findViewById(R.id.spinner_macro)
-        tvFilenamePreview = view.findViewById(R.id.tv_filename_preview)
+        etFilenamePreview = view.findViewById(R.id.et_filename_preview)
         btnSaveConfirm = view.findViewById(R.id.btn_save_confirm)
+
+        if (clipIds.size > 1) {
+            etFilenamePreview.isEnabled = false
+        }
+
+        filenameTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                isFilenameManuallyEdited = true
+            }
+        }
+        filenameTextWatcher?.let { etFilenamePreview.addTextChangedListener(it) }
 
         rvPathChoices.layoutManager = LinearLayoutManager(requireContext())
 
@@ -144,12 +164,29 @@ class SaveToPathBottomSheet : BottomSheetDialogFragment() {
                         dismiss()
                         return@launch
                     }
-                    val names = clips.mapIndexed { i, clip ->
-                        val macro = selectedMacro
-                        if (macro == null) {
-                            MacroExpander.defaultFilename(clip, i)
+                    val names = if (clips.size == 1) {
+                        val editedName = etFilenamePreview.text?.toString()?.trim().orEmpty()
+                        if (editedName.isNotBlank()) {
+                            listOf(editedName)
                         } else {
-                            MacroExpander.expand(macro.template, clip, path, i)
+                            val clip = clips.first()
+                            val macro = selectedMacro
+                            val fallbackName = if (macro == null) {
+                                MacroExpander.defaultFilename(clip, 0)
+                            } else {
+                                MacroExpander.expand(macro.template, clip, path, 0)
+                            }
+                            Logger.w(TAG, "Edited filename was blank, falling back to macro-computed name: $fallbackName")
+                            listOf(fallbackName)
+                        }
+                    } else {
+                        clips.mapIndexed { i, clip ->
+                            val macro = selectedMacro
+                            if (macro == null) {
+                                MacroExpander.defaultFilename(clip, i)
+                            } else {
+                                MacroExpander.expand(macro.template, clip, path, i)
+                            }
                         }
                     }
                     Logger.i(TAG, "Saving ${clips.size} clips to treeUri=${path.treeUri}")
@@ -171,15 +208,21 @@ class SaveToPathBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun updatePreview() {
-        val clip = firstClip ?: return
-        val path = selectedPath ?: return
-        val macro = selectedMacro
-        val name = if (macro == null) {
-            MacroExpander.defaultFilename(clip, 0)
-        } else {
-            MacroExpander.expand(macro.template, clip, path, 0)
+        if (clipIds.size > 1 || !isFilenameManuallyEdited) {
+            val clip = firstClip ?: return
+            val path = selectedPath ?: return
+            val macro = selectedMacro
+            val name = if (macro == null) {
+                MacroExpander.defaultFilename(clip, 0)
+            } else {
+                MacroExpander.expand(macro.template, clip, path, 0)
+            }
+            
+            // Programmatic update: temporarily detach watcher so isFilenameManuallyEdited is not tripped
+            filenameTextWatcher?.let { etFilenamePreview.removeTextChangedListener(it) }
+            etFilenamePreview.setText(name)
+            filenameTextWatcher?.let { etFilenamePreview.addTextChangedListener(it) }
         }
-        tvFilenamePreview.text = getString(R.string.save_filename_preview, name)
     }
 
     private class PathChoiceAdapter(

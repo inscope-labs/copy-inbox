@@ -167,4 +167,12 @@
     <string name="category_all_filter">All Categories</string>
     <string name="category_filter_label">Category:</string>
     <string name="action_skip">Skip</string>
+
+    <!-- Find & Replace -->
+    <string name="find_replace_title">Find &amp; Replace</string>
+    <string name="find_replace_find_hint">Find</string>
+    <string name="find_replace_replace_hint">Replace with</string>
+    <string name="find_replace_use_regex">Use regex</string>
+    <string name="find_replace_invalid_pattern">Invalid pattern</string>
+    <string name="action_apply">Apply</string>
 </resources>

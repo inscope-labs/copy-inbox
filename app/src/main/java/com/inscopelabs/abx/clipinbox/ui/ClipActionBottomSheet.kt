@@ -146,6 +146,15 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
         isEditing = false
         updateEditingState(currentClip)
 
+        binding.btnFindReplace.setOnClickListener {
+            FindReplaceDialogHelper.show(
+                requireContext(),
+                binding.etClipContent.text?.toString().orEmpty()
+            ) { newText ->
+                binding.etClipContent.setText(newText)
+            }
+        }
+
         binding.btnToggleEdit.setOnClickListener {
             isEditing = !isEditing
             updateEditingState(currentClip)
@@ -178,6 +187,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun updateEditingState(currentClip: ClipEntity) {
+        binding.btnFindReplace.isVisible = isEditing
         if (isEditing) {
             binding.tvSheetTitle.text = getString(R.string.sheet_title_edit_clip)
             binding.btnToggleEdit.text = getString(R.string.action_cancel)
