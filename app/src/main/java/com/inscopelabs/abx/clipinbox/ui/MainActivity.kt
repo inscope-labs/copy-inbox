@@ -91,6 +91,13 @@ class MainActivity : AppCompatActivity() {
                     .commit()
                 true
             }
+            R.id.action_categories -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, CategoriesFragment())
+                    .addToBackStack("categories")
+                    .commit()
+                true
+            }
             else -> if (DebugMenuHandler.handle(item, this)) true
                     else super.onOptionsItemSelected(item)
         }

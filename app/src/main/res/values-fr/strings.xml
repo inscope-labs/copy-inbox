@@ -148,4 +148,11 @@
     <string name="save_success">%1$d fichier(s) enregistré(s)</string>
     <string name="save_partial_failure">%1$d fichier(s) sur %2$d enregistré(s)</string>
     <string name="save_filename_preview">Nom du fichier : %1$s</string>
+
+    <!-- Categories -->
+    <string name="menu_categories">Catégories</string>
+    <string name="category_name_hint">Nom de la catégorie</string>
+    <string name="category_set_default">Définir par défaut</string>
+    <string name="category_cannot_delete_default">Définissez d\'abord une autre catégorie par défaut</string>
+    <string name="category_add">Ajouter une catégorie</string>
 </resources>

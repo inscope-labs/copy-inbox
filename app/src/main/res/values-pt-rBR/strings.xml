@@ -148,4 +148,11 @@
     <string name="save_success">%1$d arquivo(s) salvo(s)</string>
     <string name="save_partial_failure">%1$d de %2$d arquivos salvos</string>
     <string name="save_filename_preview">Nome do arquivo: %1$s</string>
+
+    <!-- Categories -->
+    <string name="menu_categories">Categorias</string>
+    <string name="category_name_hint">Nome da categoria</string>
+    <string name="category_set_default">Definir como padrão</string>
+    <string name="category_cannot_delete_default">Defina outra categoria como padrão primeiro</string>
+    <string name="category_add">Adicionar categoria</string>
 </resources>

@@ -37,4 +37,10 @@
         android:icon="@android:drawable/ic_menu_save"
         android:title="@string/menu_storage_paths"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_categories"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="@string/menu_categories"
+        app:showAsAction="never" />
 </menu>
