@@ -85,6 +85,18 @@ class ClipInBoxApplication : Application() {
 
             val database = ClipboardDatabase.getDatabase(this)
 
+            sessionGate = SessionGate(EncryptedSessionStore(this))
+            Logger.i("ClipInBoxApplication", "Initialized SessionGate")
+
+            connector = AbxMailboxConnector(sessionGate)
+            Logger.i("ClipInBoxApplication", "Initialized AbxMailboxConnector")
+
+            safPathRepository = SafPathRepository(
+                database.safPathDao(),
+                database.namingMacroDao(),
+            )
+            Logger.i("ClipInBoxApplication", "Initialized SafPathRepository")
+
             categoryRepository = CategoryRepositoryImpl(database.categoryDao(), database.clipDao())
             Logger.i("ClipInBoxApplication", "Initialized CategoryRepository")
             GlobalScope.launch(Dispatchers.IO) {
