@@ -347,6 +347,32 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
             ClipboardHelper.copyToClipboard(requireContext(), textToCopy)
             showMessage(getString(R.string.home_toast_copied_to_clipboard))
         }
+        binding.btnActionJoin.setOnClickListener {
+            val selectedClips = adapter.getSelectedClips()
+            if (selectedClips.size < 2) {
+                showMessage(getString(R.string.home_toast_select_at_least_two))
+                return@setOnClickListener
+            }
+            JoinClipsDialogHelper.show(requireContext(), selectedClips.size) { separator, deleteOriginals ->
+                lifecycleScope.launch {
+                    val sortedClips = selectedClips.sortedBy { it.timestamp }
+                    val joinedText = com.inscopelabs.abx.clipinbox.utility.ClipJoiner.join(sortedClips.map { it.content }, separator)
+                    val joinedId = repository.saveClipText(joinedText)
+                    if (joinedId != null) {
+                        repository.getClipById(joinedId)?.let { newClip ->
+                            repository.updateClip(newClip.copy(categoryId = sortedClips.first().categoryId, tags = sortedClips.first().tags))
+                        }
+                    }
+                    if (deleteOriginals) {
+                        for (clip in selectedClips) {
+                            repository.deleteClip(clip)
+                        }
+                    }
+                    adapter.clearSelection()
+                    showMessage(getString(R.string.home_toast_clips_joined))
+                }
+            }
+        }
         binding.btnActionDelete.setOnClickListener {
             val selectedClips = adapter.getSelectedClips()
             if (selectedClips.isEmpty()) return@setOnClickListener
@@ -542,6 +568,23 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
     override fun onCopyClip(clip: ClipEntity) {
         ClipboardHelper.copyToClipboard(requireContext(), clip.content)
         showMessage(getString(R.string.home_toast_copied_to_clipboard))
+    }
+
+    override fun onSplitClip(clip: ClipEntity, parts: List<String>, deleteOriginal: Boolean) {
+        lifecycleScope.launch {
+            for (part in parts) {
+                val id = repository.saveClipText(part)
+                if (id != null) {
+                    repository.getClipById(id)?.let { newClip ->
+                        repository.updateClip(newClip.copy(categoryId = clip.categoryId, tags = clip.tags))
+                    }
+                }
+            }
+            if (deleteOriginal) {
+                repository.deleteClip(clip)
+            }
+            showMessage(getString(R.string.home_toast_clip_split, parts.size))
+        }
     }
 
     override fun onDestroyView() {

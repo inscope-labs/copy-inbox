@@ -27,6 +27,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
         fun onShareClip(clip: ClipEntity)
         fun onCopyClip(clip: ClipEntity)
         fun onSelectForMultiSelect(clip: ClipEntity) {}
+        fun onSplitClip(clip: ClipEntity, parts: List<String>, deleteOriginal: Boolean) {}
     }
 
     private var _binding: BottomSheetClipActionsBinding? = null
@@ -155,6 +156,16 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        binding.btnSplitClip.setOnClickListener {
+            SplitClipDialogHelper.show(
+                requireContext(),
+                currentClip.content
+            ) { parts, deleteOriginal ->
+                callback?.onSplitClip(currentClip, parts, deleteOriginal)
+                dismiss()
+            }
+        }
+
         binding.btnToggleEdit.setOnClickListener {
             isEditing = !isEditing
             updateEditingState(currentClip)
@@ -188,6 +199,7 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
 
     private fun updateEditingState(currentClip: ClipEntity) {
         binding.btnFindReplace.isVisible = isEditing
+        binding.btnSplitClip.isVisible = !isEditing
         if (isEditing) {
             binding.tvSheetTitle.text = getString(R.string.sheet_title_edit_clip)
             binding.btnToggleEdit.text = getString(R.string.action_cancel)

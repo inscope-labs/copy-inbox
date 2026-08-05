@@ -175,4 +175,23 @@
     <string name="find_replace_use_regex">Use regex</string>
     <string name="find_replace_invalid_pattern">Invalid pattern</string>
     <string name="action_apply">Apply</string>
+
+    <!-- Split & Join -->
+    <string name="split_clip_title">Split Clip</string>
+    <string name="split_mode_delimiter">By delimiter</string>
+    <string name="split_mode_fixed_length">By fixed length</string>
+    <string name="split_delimiter_hint">Delimiter</string>
+    <string name="split_chunk_size_hint">Characters per part</string>
+    <string name="split_delete_original">Delete original after this operation</string>
+    <string name="split_delimiter_required">Enter a delimiter</string>
+    <string name="split_chunk_size_required">Enter a valid character count</string>
+    <string name="split_no_effect">Nothing to split with these settings</string>
+    <string name="action_split">Split</string>
+    <string name="join_clips_title">Join Clips</string>
+    <string name="join_clips_message_format">Join %1$d clips into one?</string>
+    <string name="action_join">Join</string>
+    <string name="action_join_clips">Join selected clips</string>
+    <string name="home_toast_select_at_least_two">Select at least 2 clips</string>
+    <string name="home_toast_clips_joined">Clips joined</string>
+    <string name="home_toast_clip_split">Split into %1$d clips</string>
 </resources>
