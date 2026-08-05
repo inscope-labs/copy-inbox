@@ -109,9 +109,16 @@ class MainActivity : AppCompatActivity() {
             if (!sharedText.isNullOrBlank()) {
                 val app = application as ClipInBoxApplication
                 lifecycleScope.launch {
-                    val saved = app.repository.saveClipText(sharedText)
-                    if (saved) {
+                    val clipId = app.repository.saveClipText(sharedText)
+                    if (clipId != null) {
                         Toast.makeText(this@MainActivity, getString(R.string.main_toast_shared_text_saved), Toast.LENGTH_SHORT).show()
+                        CategoryPickerDialogHelper.showIfEnabledAfterSave(
+                            this@MainActivity,
+                            lifecycleScope,
+                            app.categoryRepository,
+                            app.repository,
+                            clipId
+                        )
                     }
                 }
             }

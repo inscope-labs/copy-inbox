@@ -38,24 +38,60 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/settings_persistent_notification"
-                    android:textColor="@color/gray_on_surface"
-                    android:textSize="14sp" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_persistent_notification"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/settings_persistent_notification"
+                        android:textColor="@color/gray_on_surface"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_persistent_notification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbTint="@color/switch_track"
+                        app:trackTint="@color/periwinkle" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray_outline_variant" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:thumbTint="@color/switch_track"
-                    app:trackTint="@color/periwinkle" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/settings_ask_category_on_save"
+                        android:textColor="@color/gray_on_surface"
+                        android:textSize="14sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_category_dialog"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbTint="@color/switch_track"
+                        app:trackTint="@color/periwinkle" />
+
+                </LinearLayout>
 
             </LinearLayout>
 

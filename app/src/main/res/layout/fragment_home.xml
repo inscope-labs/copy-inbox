@@ -98,6 +98,31 @@
 
         </HorizontalScrollView>
 
+        <!-- Category Filter Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/category_filter_label"
+                android:textColor="@color/gray_on_surface_variant"
+                android:textSize="13sp" />
+
+            <Spinner
+                android:id="@+id/spinner_category_filter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
         <!-- Actions Banner -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.Material3.CardView.Filled"

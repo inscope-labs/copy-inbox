@@ -7,7 +7,12 @@ import com.inscopelabs.abx.clipinbox.utils.ClipboardHelper
 import com.inscopelabs.abx.clipinbox.utils.HashGenerator
 import kotlinx.coroutines.flow.Flow
 
-class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
+import com.inscopelabs.abx.clipinbox.category.CategoryRepository
+
+class ClipRepositoryImpl(
+    private val clipDao: ClipDao,
+    private val categoryRepository: CategoryRepository
+) : ClipRepository {
 
     override fun getAllClips(): Flow<List<ClipEntity>> = clipDao.getAllClips()
 
@@ -24,10 +29,10 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
         return clipDao.getClipById(id)
     }
 
-    override suspend fun saveClipText(text: String, category: String?): Boolean {
+    override suspend fun saveClipText(text: String, category: String?): Long? {
         if (text.isBlank()) {
             Logger.d("ClipRepositoryImpl", "saveClipText ignored: text is blank")
-            return false
+            return null
         }
         val trimmedText = text.trim()
         val hash = HashGenerator.sha256(trimmedText)
@@ -41,21 +46,23 @@ class ClipRepositoryImpl(private val clipDao: ClipDao) : ClipRepository {
                 isArchived = false
             )
             clipDao.updateClip(updated)
-            return true
+            return existing.id
         }
 
+        val defaultCategoryId = categoryRepository.getDefaultCategory().id
         val detectedType = category ?: ClipboardHelper.detectType(trimmedText)
         val newClip = ClipEntity(
             content = trimmedText,
             contentHash = hash,
             detectedType = detectedType,
+            categoryId = defaultCategoryId,
             timestamp = System.currentTimeMillis(),
             isArchived = false,
             isRead = false
         )
         val newId = clipDao.insertClip(newClip)
-        Logger.i("ClipRepositoryImpl", "saveClipText inserted new clip id: $newId, detectedType: $detectedType")
-        return true
+        Logger.i("ClipRepositoryImpl", "saveClipText inserted new clip id: $newId, categoryId: $defaultCategoryId, detectedType: $detectedType")
+        return newId
     }
 
     override suspend fun updateClip(clip: ClipEntity) {

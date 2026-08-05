@@ -1,22 +1,29 @@
 package com.inscopelabs.abx.clipinbox.ui
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
 import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.data.local.ClipEntity
 import com.inscopelabs.abx.clipinbox.databinding.BottomSheetClipActionsBinding
 import com.inscopelabs.abx.clipinbox.utils.TimeFormatter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class ClipActionBottomSheet : BottomSheetDialogFragment() {
 
     interface Callback {
         fun onSaveNewClip(text: String)
         fun onUpdateClip(clip: ClipEntity, newContent: String)
+        fun onUpdateClipCategory(clip: ClipEntity, categoryId: Long, tags: String)
         fun onShareClip(clip: ClipEntity)
         fun onCopyClip(clip: ClipEntity)
         fun onSelectForMultiSelect(clip: ClipEntity) {}
@@ -92,6 +99,49 @@ class ClipActionBottomSheet : BottomSheetDialogFragment() {
             currentClip.wordCount
         )
         binding.tvSheetTimestamp.text = TimeFormatter.formatDetailedTime(currentClip.timestamp)
+
+        lifecycleScope.launch {
+            try {
+                val app = requireActivity().application as ClipInBoxApplication
+                val categories = app.categoryRepository.observeCategories().first()
+                val activeCategory = categories.firstOrNull { it.id == currentClip.categoryId }
+                    ?: categories.firstOrNull { it.isDefault }
+                    ?: categories.firstOrNull()
+
+                val categoryName = activeCategory?.name ?: currentClip.detectedType
+                val colorHex = activeCategory?.colorHex ?: "#9E9E9E"
+                val dotColor = try { Color.parseColor(colorHex) } catch (_: Throwable) { Color.parseColor("#9E9E9E") }
+
+                val dotDrawable = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(dotColor)
+                }
+                binding.viewSheetCategoryDot.background = dotDrawable
+                binding.tvSheetCategoryName.text = categoryName
+
+                if (currentClip.tags.isNotBlank()) {
+                    binding.tvSheetTags.isVisible = true
+                    binding.tvSheetTags.text = currentClip.tags
+                } else {
+                    binding.tvSheetTags.isVisible = false
+                }
+
+                binding.btnChangeCategory.setOnClickListener {
+                    CategoryPickerDialogHelper.show(
+                        context = requireContext(),
+                        categories = categories,
+                        currentCategoryId = currentClip.categoryId,
+                        currentTags = currentClip.tags,
+                        onConfirm = { catId, tags ->
+                            callback?.onUpdateClipCategory(currentClip, catId, tags)
+                            dismiss()
+                        }
+                    )
+                }
+            } catch (t: Throwable) {
+                // If application context or categories fail to resolve
+            }
+        }
 
         isEditing = false
         updateEditingState(currentClip)

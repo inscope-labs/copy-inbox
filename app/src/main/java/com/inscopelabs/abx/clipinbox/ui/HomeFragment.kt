@@ -36,16 +36,20 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+import com.inscopelabs.abx.clipinbox.category.CategoryRepository
+
 class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet.Callback {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var repository: ClipRepository
+    private lateinit var categoryRepository: CategoryRepository
     private lateinit var adapter: ClipListAdapter
 
     private var searchQuery = ""
     private var selectedCategory = "All"
+    private var selectedCategoryFilterId: Long? = null
     private var collectJob: Job? = null
     private var latestClips: List<ClipEntity> = emptyList()
 
@@ -92,6 +96,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
         val app = requireActivity().application as ClipInBoxApplication
         repository = app.repository
+        categoryRepository = app.categoryRepository
 
         setupRecyclerView()
         setupSwipeGestures()
@@ -102,6 +107,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         setupFab()
         setupSelectionBar()
 
+        observeCategories()
         observeClips()
     }
 
@@ -241,6 +247,40 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         }
     }
 
+    private fun observeCategories() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                categoryRepository.observeCategories().collect { categories ->
+                    adapter.updateCategoryColors(categories.associate { it.id to it.colorHex })
+
+                    val spinnerItems = listOf(getString(R.string.category_all_filter)) + categories.map { it.name }
+                    val spinnerAdapter = android.widget.ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_spinner_item,
+                        spinnerItems
+                    ).apply {
+                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    }
+                    binding.spinnerCategoryFilter.adapter = spinnerAdapter
+
+                    val currentSelectedIdx = if (selectedCategoryFilterId == null) 0 else {
+                        val idx = categories.indexOfFirst { it.id == selectedCategoryFilterId }
+                        if (idx >= 0) idx + 1 else 0
+                    }
+                    binding.spinnerCategoryFilter.setSelection(currentSelectedIdx)
+
+                    binding.spinnerCategoryFilter.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            selectedCategoryFilterId = if (position == 0) null else categories.getOrNull(position - 1)?.id
+                            renderClips(latestClips)
+                        }
+                        override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                    }
+                }
+            }
+        }
+    }
+
     private fun setupCaptureButton() {
         binding.btnCaptureClipboard.setOnClickListener {
             val text = ClipboardHelper.getPrimaryClipText(requireContext())
@@ -248,9 +288,17 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 showMessage(getString(R.string.home_toast_clipboard_empty))
             } else {
                 lifecycleScope.launch {
-                    val saved = repository.saveClipText(text)
-                    if (saved) {
+                    val clipId = repository.saveClipText(text)
+                    if (clipId != null) {
                         showMessage(getString(R.string.home_toast_clipboard_captured))
+                        val app = requireActivity().application as ClipInBoxApplication
+                        CategoryPickerDialogHelper.showIfEnabledAfterSave(
+                            requireContext(),
+                            lifecycleScope,
+                            app.categoryRepository,
+                            repository,
+                            clipId
+                        )
                     } else {
                         showMessage(getString(R.string.home_toast_clip_exists))
                     }
@@ -340,19 +388,27 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 }
 
                 flow.collectLatest { clips ->
-                    latestClips = clips
-                    adapter.submitClips(clips)
-                    binding.recyclerViewClips.isVisible = clips.isNotEmpty()
-                    binding.layoutEmptyState.isVisible = clips.isEmpty()
-
-                    if (clips.isEmpty()) {
-                        binding.tvEmptyMessage.text = if (searchQuery.isNotBlank()) {
-                            getString(R.string.home_empty_matching_format, searchQuery)
-                        } else {
-                            getString(R.string.home_empty_no_clips_saved)
-                        }
-                    }
+                    renderClips(clips)
                 }
+            }
+        }
+    }
+
+    private fun renderClips(rawClips: List<ClipEntity>) {
+        latestClips = rawClips
+        val displayClips = selectedCategoryFilterId?.let { id ->
+            rawClips.filter { it.categoryId == id }
+        } ?: rawClips
+
+        adapter.submitClips(displayClips)
+        binding.recyclerViewClips.isVisible = displayClips.isNotEmpty()
+        binding.layoutEmptyState.isVisible = displayClips.isEmpty()
+
+        if (displayClips.isEmpty()) {
+            binding.tvEmptyMessage.text = if (searchQuery.isNotBlank()) {
+                getString(R.string.home_empty_matching_format, searchQuery)
+            } else {
+                getString(R.string.home_empty_no_clips_saved)
             }
         }
     }
@@ -443,8 +499,20 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
     override fun onSaveNewClip(text: String) {
         lifecycleScope.launch {
-            repository.saveClipText(text)
-            showMessage(getString(R.string.home_toast_clip_saved))
+            val clipId = repository.saveClipText(text)
+            if (clipId != null) {
+                showMessage(getString(R.string.home_toast_clip_saved))
+                val app = requireActivity().application as ClipInBoxApplication
+                CategoryPickerDialogHelper.showIfEnabledAfterSave(
+                    requireContext(),
+                    lifecycleScope,
+                    app.categoryRepository,
+                    repository,
+                    clipId
+                )
+            } else {
+                showMessage(getString(R.string.home_toast_clip_exists))
+            }
         }
     }
 
@@ -456,6 +524,13 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
                 wordCount = if (newContent.isBlank()) 0 else newContent.trim().split("\\s+".toRegex()).size
             )
             repository.updateClip(updated)
+            showMessage(getString(R.string.home_toast_clip_updated))
+        }
+    }
+
+    override fun onUpdateClipCategory(clip: ClipEntity, categoryId: Long, tags: String) {
+        lifecycleScope.launch {
+            repository.updateClip(clip.copy(categoryId = categoryId, tags = tags))
             showMessage(getString(R.string.home_toast_clip_updated))
         }
     }

@@ -84,25 +84,10 @@ class ClipInBoxApplication : Application() {
             DiagnosticsInitializer.initialize(this)
 
             val database = ClipboardDatabase.getDatabase(this)
-            repository = ClipRepositoryImpl(database.clipDao())
-            queueRepository = QueueRepositoryImpl(database.queueDao())
-            Logger.i("ClipInBoxApplication", "Initialized ClipRepository and QueueRepository")
-
-            sessionGate = SessionGate(EncryptedSessionStore(this))
-            Logger.i("ClipInBoxApplication", "Initialized SessionGate")
-
-            connector = AbxMailboxConnector(sessionGate)
-            Logger.i("ClipInBoxApplication", "Initialized AbxMailboxConnector")
-
-            safPathRepository = SafPathRepository(
-                database.safPathDao(),
-                database.namingMacroDao(),
-            )
-            Logger.i("ClipInBoxApplication", "Initialized SafPathRepository")
 
             categoryRepository = CategoryRepositoryImpl(database.categoryDao(), database.clipDao())
             Logger.i("ClipInBoxApplication", "Initialized CategoryRepository")
-            kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            GlobalScope.launch(Dispatchers.IO) {
                 try {
                     categoryRepository.ensureSeedCategoryExists()
                     Logger.i("ClipInBoxApplication", "Ensured seed category exists")
@@ -110,6 +95,10 @@ class ClipInBoxApplication : Application() {
                     Logger.e("ClipInBoxApplication", "Failed to ensure seed category", t)
                 }
             }
+
+            repository = ClipRepositoryImpl(database.clipDao(), categoryRepository)
+            queueRepository = QueueRepositoryImpl(database.queueDao())
+            Logger.i("ClipInBoxApplication", "Initialized ClipRepository and QueueRepository")
 
             val policy = SensitiveClipPolicy()
             val classifier = ClipClassifier()

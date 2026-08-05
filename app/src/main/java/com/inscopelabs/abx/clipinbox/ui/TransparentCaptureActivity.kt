@@ -25,14 +25,22 @@ class TransparentCaptureActivity : Activity() {
 
         val app = application as ClipInBoxApplication
         CoroutineScope(Dispatchers.IO).launch {
-            val saved = app.repository.saveClipText(text)
+            val clipId = app.repository.saveClipText(text)
             withContext(Dispatchers.Main) {
-                if (saved) {
+                if (clipId != null) {
                     Toast.makeText(applicationContext, getString(R.string.capture_toast_saved), Toast.LENGTH_SHORT).show()
+                    CategoryPickerDialogHelper.showIfEnabledAfterSave(
+                        context = this@TransparentCaptureActivity,
+                        scope = CoroutineScope(Dispatchers.Main),
+                        categoryRepository = app.categoryRepository,
+                        clipRepository = app.repository,
+                        clipId = clipId,
+                        onFinished = { finish() }
+                    )
                 } else {
                     Toast.makeText(applicationContext, getString(R.string.capture_toast_clip_exists), Toast.LENGTH_SHORT).show()
+                    finish()
                 }
-                finish()
             }
         }
     }

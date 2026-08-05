@@ -160,4 +160,11 @@
     <string name="category_set_default">Set as default</string>
     <string name="category_cannot_delete_default">Set a different default category first</string>
     <string name="category_add">Add Category</string>
+    <string name="category_tags_hint">Tags (comma-separated)</string>
+    <string name="category_picker_title">Set Category</string>
+    <string name="category_change">Change</string>
+    <string name="settings_ask_category_on_save">Ask for category on save</string>
+    <string name="category_all_filter">All Categories</string>
+    <string name="category_filter_label">Category:</string>
+    <string name="action_skip">Skip</string>
 </resources>

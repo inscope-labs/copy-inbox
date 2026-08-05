@@ -27,6 +27,12 @@ class ClipListAdapter(
 
     private val selectedIds = mutableSetOf<Long>()
     private var originalClips: List<ClipEntity> = emptyList()
+    private var categoryColors: Map<Long, String> = emptyMap()
+
+    fun updateCategoryColors(colors: Map<Long, String>) {
+        categoryColors = colors
+        notifyDataSetChanged()
+    }
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -183,6 +189,18 @@ class ClipListAdapter(
                 else -> android.R.drawable.ic_menu_sort_by_size
             }
             binding.ivCategoryIcon.setImageResource(iconRes)
+
+            val colorHex = categoryColors[clip.categoryId] ?: "#9E9E9E"
+            val dotColor = try {
+                android.graphics.Color.parseColor(colorHex)
+            } catch (_: Throwable) {
+                android.graphics.Color.parseColor("#9E9E9E")
+            }
+            val dotDrawable = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(dotColor)
+            }
+            binding.viewCategoryDot.background = dotDrawable
 
             binding.cardClip.setOnClickListener {
                 if (isSelectionMode()) {

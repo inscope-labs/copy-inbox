@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
 import com.inscopelabs.abx.clipinbox.R
+import com.inscopelabs.abx.clipinbox.category.CategoryPreferences
 import com.inscopelabs.abx.clipinbox.diagnostics.Logger
 import com.inscopelabs.abx.clipinbox.service.overlay.OverlayPermissionGate
 import com.inscopelabs.abx.clipinbox.service.overlay.OverlayService
@@ -18,6 +19,7 @@ import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
 class SettingsFragment : Fragment() {
 
     private lateinit var switchPersistentNotification: SwitchMaterial
+    private lateinit var switchCategoryDialog: SwitchMaterial
     private lateinit var switchOverlay: SwitchMaterial
     private lateinit var tvOverlayPermissionHint: TextView
     private lateinit var btnOverlayPermission: Button
@@ -32,6 +34,7 @@ class SettingsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
         switchPersistentNotification = view.findViewById(R.id.switch_persistent_notification)
+        switchCategoryDialog = view.findViewById(R.id.switch_category_dialog)
         switchOverlay = view.findViewById(R.id.switch_overlay)
         tvOverlayPermissionHint = view.findViewById(R.id.tv_overlay_permission_hint)
         btnOverlayPermission = view.findViewById(R.id.btn_overlay_permission)
@@ -51,6 +54,14 @@ class SettingsFragment : Fragment() {
             Logger.i(TAG, "switchPersistentNotification changed: $isChecked")
             (requireActivity().application as ClipInBoxApplication)
                 .setNotificationTriggerEnabled(isChecked)
+        }
+
+        switchCategoryDialog.isChecked =
+            CategoryPreferences.isSaveDialogEnabled(requireContext())
+
+        switchCategoryDialog.setOnCheckedChangeListener { _, isChecked ->
+            Logger.i(TAG, "switchCategoryDialog changed: $isChecked")
+            CategoryPreferences.setSaveDialogEnabled(requireContext(), isChecked)
         }
 
         switchOverlay.setOnCheckedChangeListener { _, isChecked ->
