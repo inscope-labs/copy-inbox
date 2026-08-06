@@ -176,6 +176,13 @@
     <string name="find_replace_invalid_pattern">Invalid pattern</string>
     <string name="action_apply">Apply</string>
 
+    <!-- Navigation Tabs & Manage -->
+    <string name="manage_tab_categories">Categories</string>
+    <string name="manage_tab_connection">Connection</string>
+    <string name="nav_tab_inbox">Inbox</string>
+    <string name="nav_tab_manage">Manage</string>
+    <string name="nav_tab_storage">Storage</string>
+
     <!-- Split & Join -->
     <string name="split_clip_title">Split Clip</string>
     <string name="split_mode_delimiter">By delimiter</string>

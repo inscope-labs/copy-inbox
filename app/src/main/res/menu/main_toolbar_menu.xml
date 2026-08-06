@@ -3,44 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_export_txt"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="Export to TXT"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_clear_unpinned"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Clear Unpinned Clips"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_qr_generator"
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/menu_qr_generator"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_session"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="@string/menu_session"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/menu_settings"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_storage_paths"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="@string/menu_storage_paths"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_categories"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="@string/menu_categories"
         app:showAsAction="never" />
 </menu>

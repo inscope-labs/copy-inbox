@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.tabs.TabLayout
 import com.inscopelabs.abx.clipinbox.ClipInBoxApplication
 import com.inscopelabs.abx.clipinbox.R
 import com.inscopelabs.abx.clipinbox.databinding.ActivityMainBinding
@@ -38,6 +40,49 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.navTabLayout.addTab(binding.navTabLayout.newTab().setText(getString(R.string.nav_tab_inbox)))
+        binding.navTabLayout.addTab(binding.navTabLayout.newTab().setText(getString(R.string.nav_tab_manage)))
+        binding.navTabLayout.addTab(binding.navTabLayout.newTab().setText(getString(R.string.nav_tab_storage)))
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
+        }
+
+        binding.navTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val fragment = when (tab.position) {
+                    0 -> HomeFragment()
+                    1 -> ManageFragment()
+                    2 -> StoragePathsFragment()
+                    else -> HomeFragment()
+                }
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit()
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                } else if (binding.navTabLayout.selectedTabPosition != 0) {
+                    binding.navTabLayout.getTabAt(0)?.select()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
+
         handleShareIntent(intent)
     }
 
@@ -53,16 +98,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? HomeFragment
         return when (item.itemId) {
-            R.id.action_export_txt -> {
-                fragment?.exportTxt()
-                true
-            }
-            R.id.action_clear_unpinned -> {
-                fragment?.clearUnpinned()
-                true
-            }
             R.id.action_qr_generator -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, QrFragment())
@@ -70,31 +106,10 @@ class MainActivity : AppCompatActivity() {
                     .commit()
                 true
             }
-            R.id.action_session -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, SessionFragment())
-                    .addToBackStack("session")
-                    .commit()
-                true
-            }
             R.id.action_settings -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, SettingsFragment())
                     .addToBackStack("settings")
-                    .commit()
-                true
-            }
-            R.id.action_storage_paths -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, StoragePathsFragment())
-                    .addToBackStack("storage_paths")
-                    .commit()
-                true
-            }
-            R.id.action_categories -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, CategoriesFragment())
-                    .addToBackStack("categories")
                     .commit()
                 true
             }

@@ -107,6 +107,19 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         setupFab()
         setupSelectionBar()
 
+        requireActivity().addMenuProvider(object : androidx.core.view.MenuProvider {
+            override fun onCreateMenu(menu: android.view.Menu, menuInflater: android.view.MenuInflater) {
+                menuInflater.inflate(R.menu.inbox_toolbar_menu, menu)
+            }
+            override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_export_txt -> { exportTxt(); true }
+                    R.id.action_clear_unpinned -> { clearUnpinned(); true }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         observeCategories()
         observeClips()
     }
