@@ -137,11 +137,11 @@ jobs:
           NEW_PATCH="${{ steps.versioning.outputs.release_patch }}"
           FULL_VERSION="${{ steps.versioning.outputs.version_name }}"
 
-          cat << EOF > release-code.txt
-releaseMajor=$MAJOR
-releaseMinor=$MINOR
-releasePatch=$NEW_PATCH
-EOF
+          {
+            echo "releaseMajor=$MAJOR"
+            echo "releaseMinor=$MINOR"
+            echo "releasePatch=$NEW_PATCH"
+          } > release-code.txt
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
