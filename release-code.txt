@@ -1,1 +1,2 @@
-version code
+releaseMajor=0
+releaseMinor=1
