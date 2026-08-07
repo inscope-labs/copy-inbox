@@ -48,8 +48,29 @@ jobs:
             echo "Using existing debug.keystore"
           fi
 
+      - name: Read version info
+        id: read_version
+        run: |
+          PROP_FILE="version.properties"
+          if [ -f "$PROP_FILE" ]; then
+            VERSION_CODE=$(grep '^versionCode=' "$PROP_FILE" | cut -d'=' -f2 | tr -d '\r')
+            VERSION_NAME=$(grep '^versionName=' "$PROP_FILE" | cut -d'=' -f2 | tr -d '\r')
+            DEBUG_CODE=$(grep '^debugCode=' "$PROP_FILE" | cut -d'=' -f2 | tr -d '\r')
+          fi
+
+          VERSION_CODE=${VERSION_CODE:-1}
+          VERSION_NAME=${VERSION_NAME:-1.0}
+          DEBUG_CODE=${DEBUG_CODE:-0001}
+
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "debug_code=$DEBUG_CODE" >> $GITHUB_OUTPUT
+
       - name: Assemble Debug APK
-        run: gradle --no-daemon assembleDebug
+        run: |
+          gradle --no-daemon assembleDebug \
+            -PversionCode=${{ steps.read_version.outputs.version_code }} \
+            -PversionName="${{ steps.read_version.outputs.version_name }}.${{ steps.read_version.outputs.debug_code }}"
 
       - name: Run Debug Unit Tests
         run: gradle --no-daemon testDebugUnitTest

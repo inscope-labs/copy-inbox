@@ -36,12 +36,14 @@ can be read outside this environment.
 For every task, the AI Studio agent must assess a probability score (0-100) representing the likelihood that the task needs a new debug build.
 - If the score is **greater than 75**, increment `versionCode` by 1 and `debugCode` by 1 (preserving its zero-padded width, e.g. `0003` -> `0004`).
 - `versionName` stays manual-only and is not auto-incremented by the agent.
+- `versionCode` from `version.properties` is the single counter shared by both debug and release builds (passed to Gradle via `-PversionCode`), while `versionName` differs per build type as implemented in the two workflows.
 - The mandatory agent process report MUST explicitly state the assessed probability score and the resulting version increment action taken.
 
 ## 2a. Release Tracking (release-code.txt)
 
 `release-code.txt` is owned exclusively by the `build-apk-release.yml` CI workflow.
 - It tracks `releaseMajor`, `releaseMinor`, and `releasePatch`.
+- `release-code.txt`'s `releasePatch` is incremented and persisted by `build-apk-release.yml` itself after each successful release build — the AI Studio agent should never manually edit `releasePatch`.
 - It is NOT subject to the agent-only restriction defined in Section 2.
 - The `build-apk-release.yml` workflow reads these parameters to compute the release version output for builds.
 

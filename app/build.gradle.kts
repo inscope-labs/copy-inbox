@@ -18,8 +18,8 @@ android {
     applicationId = "com.inscopelabs.abx.clipinbox"
     minSdk = 24
     targetSdk = 36
-    versionCode = 3
-    versionName = "1.0"
+    versionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull() ?: 3
+    versionName = project.findProperty("versionName")?.toString() ?: "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

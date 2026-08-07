@@ -44,6 +44,12 @@ jobs:
           MINOR=${MINOR:-1}
           PATCH=${PATCH:-0}
 
+          VERSION_CODE=1
+          if [ -f "version.properties" ]; then
+            VC=$(grep '^versionCode=' "version.properties" | cut -d'=' -f2 | tr -d '\r')
+            VERSION_CODE=${VC:-1}
+          fi
+
           echo "Read version: $MAJOR.$MINOR.$PATCH"
 
           # Increment patch variable in memory for workflow
@@ -51,7 +57,11 @@ jobs:
 
           FULL_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
           echo "Workflow release version: $FULL_VERSION"
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
           echo "version_name=$FULL_VERSION" >> $GITHUB_OUTPUT
+          echo "release_major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "release_minor=$MINOR" >> $GITHUB_OUTPUT
+          echo "release_patch=$NEW_PATCH" >> $GITHUB_OUTPUT
 
       - name: Ensure release keystore exists
         run: |
@@ -75,7 +85,10 @@ jobs:
           KEYSTORE_PATH: ${{ github.workspace }}/my-upload-key.jks
           STORE_PASSWORD: android
           KEY_PASSWORD: android
-        run: gradle --no-daemon assembleRelease
+        run: |
+          gradle --no-daemon assembleRelease \
+            -PversionCode=${{ steps.versioning.outputs.version_code }} \
+            -PversionName="${{ steps.versioning.outputs.version_name }}"
 
       - name: Upload Release APK
         if: success()
@@ -84,3 +97,24 @@ jobs:
           name: app-release
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Persist release-code.txt
+        if: success()
+        run: |
+          MAJOR="${{ steps.versioning.outputs.release_major }}"
+          MINOR="${{ steps.versioning.outputs.release_minor }}"
+          NEW_PATCH="${{ steps.versioning.outputs.release_patch }}"
+          FULL_VERSION="${{ steps.versioning.outputs.version_name }}"
+
+          cat << EOF > release-code.txt
+releaseMajor=$MAJOR
+releaseMinor=$MINOR
+releasePatch=$NEW_PATCH
+EOF
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release-code.txt
+          git commit -m "ci: record release version $FULL_VERSION"
+          git pull --rebase origin main
+          git push
