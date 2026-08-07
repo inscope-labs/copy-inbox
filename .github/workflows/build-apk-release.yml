@@ -33,13 +33,7 @@ jobs:
       - name: Read version properties and calculate version
         id: versioning
         run: |
-          PROP_FILE="version.properties"
-          if [ ! -f "$PROP_FILE" ]; then
-            if [ -f "release-code.txt" ]; then
-              PROP_FILE="release-code.txt"
-            fi
-          fi
-
+          PROP_FILE="release-code.txt"
           if [ -f "$PROP_FILE" ]; then
             MAJOR=$(grep '^releaseMajor=' "$PROP_FILE" | cut -d'=' -f2 | tr -d '\r')
             MINOR=$(grep '^releaseMinor=' "$PROP_FILE" | cut -d'=' -f2 | tr -d '\r')

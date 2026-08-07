@@ -24,12 +24,26 @@ The report must include:
 This folder must NOT be gitignored; it must be pushed to GitHub so it
 can be read outside this environment.
 
-## 2. Version Increment Rule
+## 2. Version Increment Rule (version.properties)
 
-Every meaningful task, bug fix, feature addition, or refactoring in copy-inbox must increment the app's `versionCode` in `app/build.gradle.kts` by 1.
-- `versionCode` MUST be incremented as an integer in `app/build.gradle.kts` (e.g. `versionCode = 1` -> `versionCode = 2`).
-- `versionName` should be updated or kept consistent as appropriate for the release scope.
-- Always verify that `app/build.gradle.kts` retains valid syntax after updating `versionCode`.
+`version.properties` is exclusively AI-Studio-agent-controlled. CI workflows must NEVER write to `version.properties`.
+
+`version.properties` uses the following keys:
+- `versionCode` (integer)
+- `versionName` (string, e.g. `1.0`)
+- `debugCode` (zero-padded integer string, e.g. `0003`)
+
+For every task, the AI Studio agent must assess a probability score (0-100) representing the likelihood that the task needs a new debug build.
+- If the score is **greater than 75**, increment `versionCode` by 1 and `debugCode` by 1 (preserving its zero-padded width, e.g. `0003` -> `0004`).
+- `versionName` stays manual-only and is not auto-incremented by the agent.
+- The mandatory agent process report MUST explicitly state the assessed probability score and the resulting version increment action taken.
+
+## 2a. Release Tracking (release-code.txt)
+
+`release-code.txt` is owned exclusively by the `build-apk-release.yml` CI workflow.
+- It tracks `releaseMajor`, `releaseMinor`, and `releasePatch`.
+- It is NOT subject to the agent-only restriction defined in Section 2.
+- The `build-apk-release.yml` workflow reads these parameters to compute the release version output for builds.
 
 ## 3. Mandatory Logging Standard
 
