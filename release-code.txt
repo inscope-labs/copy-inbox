@@ -1,2 +1,3 @@
 releaseMajor=0
 releaseMinor=1
+releasePatch=0
