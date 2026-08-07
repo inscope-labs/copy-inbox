@@ -24,12 +24,12 @@ The report must include:
 This folder must NOT be gitignored; it must be pushed to GitHub so it
 can be read outside this environment.
 
-## 2. Version Increment Rule — NOT YET ACTIVE
+## 2. Version Increment Rule
 
-copy-inbox does not currently have a version.properties file. Do not
-create one speculatively. This section will be added once that
-infrastructure is scoped in a dedicated task — until then, do not
-attempt version-increment logic of any kind.
+Every meaningful task, bug fix, feature addition, or refactoring in copy-inbox must increment the app's `versionCode` in `app/build.gradle.kts` by 1.
+- `versionCode` MUST be incremented as an integer in `app/build.gradle.kts` (e.g. `versionCode = 1` -> `versionCode = 2`).
+- `versionName` should be updated or kept consistent as appropriate for the release scope.
+- Always verify that `app/build.gradle.kts` retains valid syntax after updating `versionCode`.
 
 ## 3. Mandatory Logging Standard
 
