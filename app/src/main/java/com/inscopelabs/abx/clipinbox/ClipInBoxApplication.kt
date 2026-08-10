@@ -28,6 +28,8 @@ import com.inscopelabs.abx.clipinbox.security.AutoClearScheduler
 import com.inscopelabs.abx.clipinbox.security.SensitiveClipPolicy
 import com.inscopelabs.abx.clipinbox.service.ClipboardWatcher
 import com.inscopelabs.abx.clipinbox.service.OtpAutoCapture
+import com.inscopelabs.abx.clipinbox.tag.TagRepository
+import com.inscopelabs.abx.clipinbox.tag.TagRepositoryImpl
 import com.inscopelabs.abx.clipinbox.utils.NotificationHelper
 import com.inscopelabs.abx.clipinbox.utils.NotificationPreferences
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +54,9 @@ class ClipInBoxApplication : Application() {
         private set
 
     lateinit var categoryRepository: CategoryRepository
+        private set
+
+    lateinit var tagRepository: TagRepository
         private set
 
     lateinit var clipboardWatcher: ClipboardWatcher
@@ -105,6 +110,17 @@ class ClipInBoxApplication : Application() {
                     Logger.i("ClipInBoxApplication", "Ensured seed category exists")
                 } catch (t: Throwable) {
                     Logger.e("ClipInBoxApplication", "Failed to ensure seed category", t)
+                }
+            }
+
+            tagRepository = TagRepositoryImpl(database.tagDao(), database.clipDao())
+            Logger.i("ClipInBoxApplication", "Initialized TagRepository")
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    tagRepository.ensureSystemTagsSeeded()
+                    Logger.i("ClipInBoxApplication", "Ensured system tags seeded")
+                } catch (t: Throwable) {
+                    Logger.e("ClipInBoxApplication", "Failed to ensure system tags seeded", t)
                 }
             }
 

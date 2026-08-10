@@ -6,12 +6,24 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.inscopelabs.abx.clipinbox.data.local.ClipTagCrossRef
+import com.inscopelabs.abx.clipinbox.data.local.TagDao
+import com.inscopelabs.abx.clipinbox.data.local.TagEntity
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueDao
 import com.inscopelabs.abx.clipinbox.domain.queue.QueueEntity
+import com.inscopelabs.abx.clipinbox.tag.SystemTags
 
 @Database(
-    entities = [ClipEntity::class, CategoryEntity::class, QueueEntity::class, SafPath::class, NamingMacro::class],
-    version = 5,
+    entities = [
+        ClipEntity::class,
+        CategoryEntity::class,
+        QueueEntity::class,
+        SafPath::class,
+        NamingMacro::class,
+        TagEntity::class,
+        ClipTagCrossRef::class
+    ],
+    version = 6,
     exportSchema = false
 )
 abstract class ClipboardDatabase : RoomDatabase() {
@@ -20,6 +32,7 @@ abstract class ClipboardDatabase : RoomDatabase() {
     abstract fun queueDao(): QueueDao
     abstract fun safPathDao(): SafPathDao
     abstract fun namingMacroDao(): NamingMacroDao
+    abstract fun tagDao(): TagDao
 
     companion object {
         @Volatile
@@ -134,6 +147,46 @@ abstract class ClipboardDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val now = System.currentTimeMillis()
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `tags` (
+                      `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                      `label` TEXT NOT NULL,
+                      `colorHex` TEXT NOT NULL,
+                      `isSystemReserved` INTEGER NOT NULL DEFAULT 0,
+                      `isDeleted` INTEGER NOT NULL DEFAULT 0,
+                      `createdAt` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `clip_tag_cross_ref` (
+                      `clipId` INTEGER NOT NULL,
+                      `tagId` INTEGER NOT NULL,
+                      PRIMARY KEY(`clipId`, `tagId`)
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE INDEX IF NOT EXISTS `index_clip_tag_cross_ref_tagId` ON `clip_tag_cross_ref` (`tagId`)
+                    """.trimIndent()
+                )
+                SystemTags.ALL_SYSTEM_TAGS.forEach { sysTag ->
+                    db.execSQL(
+                        """
+                        INSERT INTO `tags` (`id`, `label`, `colorHex`, `isSystemReserved`, `isDeleted`, `createdAt`)
+                        VALUES (${sysTag.id}, '${sysTag.label}', '${sysTag.colorHex}', 1, 0, $now)
+                        """.trimIndent()
+                    )
+                }
+            }
+        }
+
         fun getDatabase(context: Context): ClipboardDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -141,7 +194,7 @@ abstract class ClipboardDatabase : RoomDatabase() {
                     ClipboardDatabase::class.java,
                     "clipinbox_db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
