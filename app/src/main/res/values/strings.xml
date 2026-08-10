@@ -179,9 +179,22 @@
     <!-- Navigation Tabs & Manage -->
     <string name="manage_tab_categories">Categories</string>
     <string name="manage_tab_connection">Connection</string>
+    <string name="manage_tab_tags">Tags</string>
     <string name="nav_tab_inbox">Inbox</string>
     <string name="nav_tab_manage">Manage</string>
     <string name="nav_tab_storage">Storage</string>
+
+    <!-- Tags -->
+    <string name="tag_name_hint">Tag name</string>
+    <string name="tag_add">Add Tag</string>
+    <string name="tag_cannot_delete_system">System-reserved tags are protected and cannot be deleted</string>
+    <string name="tag_system_reserved_lock">System reserved tag</string>
+    <string name="tag_filter_label">Tag:</string>
+    <string name="tag_filter_options">Tag Filter Options</string>
+    <string name="tag_filter_match_all">Match all selected tags (AND)</string>
+    <string name="tag_filter_match_any">Match any selected tag (OR)</string>
+    <string name="tag_all_filter">All Tags</string>
+    <string name="tag_options_dialog_title">Tag Filter Mode</string>
 
     <!-- Split & Join -->
     <string name="split_clip_title">Split Clip</string>

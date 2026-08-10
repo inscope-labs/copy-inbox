@@ -32,7 +32,8 @@ class ManageFragment : Fragment() {
         categoryTabBar.setTabs(
             listOf(
                 getString(R.string.manage_tab_categories),
-                getString(R.string.manage_tab_connection)
+                getString(R.string.manage_tab_connection),
+                getString(R.string.manage_tab_tags)
             )
         ) { index ->
             showTab(index)
@@ -48,6 +49,7 @@ class ManageFragment : Fragment() {
         val targetFragment = when (index) {
             0 -> if (currentFragment !is CategoriesFragment) CategoriesFragment() else null
             1 -> if (currentFragment !is SessionFragment) SessionFragment() else null
+            2 -> if (currentFragment !is TagsFragment) TagsFragment() else null
             else -> null
         }
 

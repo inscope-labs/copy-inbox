@@ -72,7 +72,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         binding.recyclerViewClips.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewClips.adapter = adapter
 
-        filterController = HomeFilterController(requireContext(), viewLifecycleOwner, app.categoryRepository, adapter, { observeClips(app) }, { latestClips }, { renderClips(it) })
+        filterController = HomeFilterController(requireContext(), viewLifecycleOwner, app.categoryRepository, app.tagRepository, adapter, { observeClips(app) }, { latestClips }, { renderClips(it) })
         selectionBarController = HomeSelectionBarController(requireContext(), lifecycleScope, app.repository, adapter, parentFragmentManager) { showMessage(it) }
         actionHandler = HomeClipActionHandler(requireContext(), lifecycleScope, app.repository, app.categoryRepository, childFragmentManager, { showMessage(it) }, { shareText(it) })
 
@@ -80,6 +80,8 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
 
         filterController.setupSearch(binding)
         filterController.setupCategoryChips(binding)
+        filterController.setupTagFilter(binding)
+        filterController.setupTagFilterOptions(binding)
         selectionBarController.setupSelectionBar(binding)
 
         binding.btnCaptureClipboard.setOnClickListener {
@@ -107,6 +109,7 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         filterController.observeCategories(binding)
+        filterController.observeTags(binding)
         observeClips(app)
     }
 
@@ -114,15 +117,26 @@ class HomeFragment : Fragment(), ClipListAdapter.Listener, ClipActionBottomSheet
         collectJob?.cancel()
         collectJob = viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val tagIds = filterController.selectedTagIds
+                val matchAll = filterController.matchAllTags
                 val sq = filterController.searchQuery
                 val sc = filterController.selectedCategory
                 val flow = when {
+                    tagIds.isNotEmpty() -> app.tagRepository.observeClipsForTags(tagIds, matchAll)
                     sq.isNotBlank() -> app.repository.searchClips(sq)
                     sc == "Favorites" -> app.repository.getFavoriteClips()
                     sc != "All" -> app.repository.getClipsByDetectedType(sc)
                     else -> app.repository.getInboxClips()
                 }
-                flow.collectLatest { renderClips(it) }
+                flow.collectLatest { rawClips ->
+                    var filtered = rawClips
+                    if (tagIds.isNotEmpty()) {
+                        if (sq.isNotBlank()) filtered = filtered.filter { it.content.contains(sq, ignoreCase = true) }
+                        if (sc == "Favorites") filtered = filtered.filter { it.isFavorite }
+                        else if (sc != "All") filtered = filtered.filter { it.detectedType == sc }
+                    }
+                    renderClips(filtered)
+                }
             }
         }
     }

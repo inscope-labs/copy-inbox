@@ -17,3 +17,12 @@ These require chairman (John) sign-off before any implementation task can be wri
 - `ClipTagCrossRef` (`clipId`, `tagId`) — many-to-many join table
 - **Schema Isolation**: This is a distinct schema effort from CBX-DAG's blocks/blocked-by dependency-linking between clips (an edge relationship, not a tag) — the two must not be merged into one feature or one migration.
 - **Migration Strategy**: Expected to require its own Room schema migration, landing after whatever version the existing Category v4->v5 migration left the schema at.
+
+---
+
+## RESOLVED
+- **Date Resolved**: 2026-08-10
+- **Resolving Agent Reports**:
+  - `agent-reports/2026-08-10T21-15-30Z-tag-repository-part-a-data-layer.md`
+  - `agent-reports/2026-08-10T14-35-00Z-tag-repository-part-b-ui.md`
+- **Resolution Summary**: Completed Part A (Data Layer: Room schema v6 DDL, TagEntity, ClipTagCrossRef, TagDao with AND/OR filter observe queries, TagRepository/Impl, SystemTags) and Part B (UI: fragment_tags.xml, TagAdapter with system-tag lock affordance, TagsFragment, ManageFragment third tab, fragment_home.xml Tag Filter Row with AND/OR filter mode settings, HomeFilterController wiring).
