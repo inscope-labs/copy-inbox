@@ -66,6 +66,47 @@ jobs:
           echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "debug_code=$DEBUG_CODE" >> $GITHUB_OUTPUT
 
+      - name: Fetch launcher icon assets
+        run: |
+          set -e
+          git fetch origin assets/launcher-icons
+          git worktree add /tmp/icon-assets origin/assets/launcher-icons
+
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            src_dir="/tmp/icon-assets/res/mipmap-${density}"
+            dest_dir="app/src/main/res/mipmap-${density}"
+            test -d "$src_dir" || { echo "FAIL: missing $src_dir"; exit 1; }
+            mkdir -p "$dest_dir"
+            cp "$src_dir"/*.png "$dest_dir"/
+          done
+
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+          cp /tmp/icon-assets/res/mipmap-anydpi-v26/ic_launcher.xml \
+             app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          cp /tmp/icon-assets/res/mipmap-anydpi-v26/ic_launcher_round.xml \
+             app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+
+          mkdir -p store-assets
+          cp /tmp/icon-assets/play_store_512.png \
+             store-assets/ic_launcher-playstore.png
+          cp /tmp/icon-assets/1024.png \
+             store-assets/ic_launcher-1024.png
+
+          git worktree remove /tmp/icon-assets --force
+
+      - name: Verify launcher icons were placed
+        run: |
+          set -e
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            test -f "app/src/main/res/mipmap-${density}/ic_launcher.png"
+            test -f "app/src/main/res/mipmap-${density}/ic_launcher_adaptive_back.png"
+            test -f "app/src/main/res/mipmap-${density}/ic_launcher_adaptive_fore.png"
+          done
+          test -f "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+          test -f "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+          test -f "store-assets/ic_launcher-playstore.png"
+          test -f "store-assets/ic_launcher-1024.png"
+
       - name: Assemble Debug APK
         run: |
           gradle --no-daemon assembleDebug \
