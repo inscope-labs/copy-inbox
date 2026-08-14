@@ -48,8 +48,10 @@ class DagLifecycleEngine(
 
         // 9. CREATE DELEGATION – build ephemeral envelope (delegated to PushDelegationUseCase)
 
-        // 10. PUSH – to Cloudflare
-        val delegationId = pushDelegation.execute(signature)
+        // 10. PUSH – to Cloudflare (manifest is needed here for dagId/sessionId —
+        //     previously only the signature was passed through, silently
+        //     losing the delegation's own identity)
+        val delegationId = pushDelegation.execute(manifest, signature)
 
         // 11. ACTIVATE – CBX-LINK now exposes resources (MCP + REST)
 
